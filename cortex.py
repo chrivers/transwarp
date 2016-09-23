@@ -3,16 +3,23 @@
 import sys, os
 import re
 import fileinput
+from pprint import pprint
 
 RE_BLANK   = re.compile("^\s+$")
 RE_SECTION = re.compile("^(\w+)\s+(.*)")
 RE_FIELD   = re.compile("^    (.*)")
 
 def parse_enum(header, lines):
-    print (header, lines)
+    RE_ENUM_FIELD = re.compile("(\w+)\s*=\s*(\w+)")
+    fields = []
+    for line in lines:
+        field = RE_ENUM_FIELD.match(line)
+        name, value = field.groups()
+        fields.append((name, int(value, 0)))
+    return fields
 
 def parse(lines):
-    elements = []
+    sections = []
     def nextline():
         try:
             return next(lines)
@@ -39,13 +46,19 @@ def parse(lines):
                     section_lines.append(field.group(1))
                 else:
                     typename, header = section.groups()
-                    elements.append((typename, header, section_lines))
+                    sections.append((typename, header, section_lines))
                     break
         else:
-            print("Unknown line: %r" % line)
-            sys.exit()
-    return elements
+            raise ValueError("Unknown line: %r" % line)
+    return sections
 
-from pprint import pprint
+sections = parse(fileinput.input())
+blocks = []
+for typename, header, lines in sections:
+    print("Parsing [%s] section.." % typename)
+    if typename == "enum":
+        blocks.append(parse_enum(header, lines))
+    elif typename == "flags":
+        pass
 
-pprint(parse(fileinput.input()), width=300)
+pprint(blocks)
