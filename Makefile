@@ -1,5 +1,5 @@
 SHELL=/bin/zsh
 
 clean:
-	@rm -fv **/*~
-	@rm -rf **/__pycache__
+	@rm -fv **/*~(N)
+	@rm -rf **/__pycache__(N)
