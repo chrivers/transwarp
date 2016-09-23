@@ -17,10 +17,10 @@ def parse_enum(header, lines):
     return (header, fields)
 
 def parse_case(name, lines):
-    return (name, len(lines))
+    return parse_struct(name, iter(lines))
 
 def parse_packet(header, lines):
-    return [parse_case(c[0], c[2]) for c in parse(iter(lines))]
+    return (header, [parse_case(c[0], c[2]) for c in parse(iter(lines))])
 
 def parse_struct(header, lines):
     RE_STRUCT_FIELD = re.compile("(\w+):\s*(.*)")
