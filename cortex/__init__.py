@@ -79,3 +79,9 @@ def parse(lines):
         else:
             raise ValueError("Unknown line: %r" % line)
     return sections
+
+def organize(items):
+    res = {}
+    for tup in items:
+        res.setdefault(tup[0], []).append(tup[1:])
+    return res
