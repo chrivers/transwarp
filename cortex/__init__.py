@@ -2,7 +2,8 @@
 
 import re
 
-RE_BLANK   = re.compile("^\s+$")
+RE_BLANK   = re.compile("^\s+$|^\s*##.*")
+RE_DOC     = re.compile("^#([^#].*)$")
 RE_SECTION = re.compile("^(\w+)\s*(.*)$")
 RE_FIELD   = re.compile("^    (.*)")
 
@@ -18,9 +19,24 @@ def parse_enum(header, lines):
 def parse_case(name, lines):
     return (name, len(lines))
 
-def parse_packet(header, lns):
-    lines = iter(lns)
-    return [parse_case(c[0], c[2]) for c in parse(lines)]
+def parse_packet(header, lines):
+    return [parse_case(c[0], c[2]) for c in parse(iter(lines))]
+
+def parse_struct(header, lines):
+    RE_STRUCT_FIELD = re.compile("(\w+):\s*(.*)")
+    fields = []
+    comment = []
+    for line in lines:
+        doc = RE_DOC.match(line)
+        if doc:
+            comment.append(doc.group(1).strip())
+            continue
+        field = RE_STRUCT_FIELD.match(line)
+        if field:
+            name, typ = field.groups()
+            fields.append((name, typ, comment))
+            comment = []
+    return (header, fields)
 
 def parse(lines):
     def nextline(lines):
@@ -30,15 +46,23 @@ def parse(lines):
             return ""
 
     sections = []
+    comment = []
     line = nextline(lines)
     while line:
         if RE_BLANK.match(line):
             line = nextline(lines)
             continue
+        docline = RE_DOC.match(line)
+        if docline:
+            comment.append(docline.group(1))
+            line = nextline(lines)
+            continue
 
         section = RE_SECTION.search(line)
         if section:
+            section_comment = comment[:]
             section_lines = []
+            comment = []
             while line:
                 line = nextline(lines)
                 if RE_BLANK.match(line):
@@ -48,9 +72,10 @@ def parse(lines):
                 if field:
                     section_lines.append(field.group(1))
                 else:
-                    typename, header = section.groups()
-                    sections.append((typename, header, section_lines))
+                    typ, header = section.groups()
+                    sections.append((typ, header, section_lines, section_comment))
                     break
+            continue
         else:
             raise ValueError("Unknown line: %r" % line)
     return sections
