@@ -6,7 +6,7 @@ import fileinput
 from pprint import pprint
 
 RE_BLANK   = re.compile("^\s+$")
-RE_SECTION = re.compile("^(\w+)\s+(.*)")
+RE_SECTION = re.compile("^(\w+)\s*(.*)$")
 RE_FIELD   = re.compile("^    (.*)")
 
 def parse_enum(header, lines):
@@ -16,28 +16,35 @@ def parse_enum(header, lines):
         field = RE_ENUM_FIELD.match(line)
         name, value = field.groups()
         fields.append((name, int(value, 0)))
-    return fields
+    return (header, fields)
+
+def parse_case(name, lines):
+    return (name, len(lines))
+
+def parse_packet(header, lns):
+    lines = iter(lns)
+    return [parse_case(c[0], c[2]) for c in parse(lines)]
 
 def parse(lines):
-    sections = []
-    def nextline():
+
+    def nextline(lines):
         try:
             return next(lines)
         except StopIteration:
             return ""
 
-    line = nextline()
-
+    sections = []
+    line = nextline(lines)
     while line:
         if RE_BLANK.match(line):
-            line = next(lines)
+            line = nextline(lines)
             continue
 
         section = RE_SECTION.search(line)
         if section:
             section_lines = []
             while line:
-                line = nextline()
+                line = nextline(lines)
                 if RE_BLANK.match(line):
                     continue
 
@@ -55,9 +62,11 @@ def parse(lines):
 sections = parse(fileinput.input())
 blocks = []
 for typename, header, lines in sections:
-    print("Parsing [%s] section.." % typename)
+    # print("Parsing [%s] section.." % typename)
     if typename == "enum":
         blocks.append(parse_enum(header, lines))
+    elif typename == "packet":
+        blocks.append(parse_packet(header, lines))
     elif typename == "flags":
         pass
 
