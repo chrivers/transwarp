@@ -6,14 +6,26 @@ from pprint import pprint
 import cortex
 
 sections = cortex.parse(fileinput.input())
-blocks = []
-for typename, header, lines in sections:
-    # print("Parsing [%s] section.." % typename)
-    if typename == "enum":
-        blocks.append(cortex.parse_enum(header, lines))
-    elif typename == "packet":
-        blocks.append(cortex.parse_packet(header, lines))
-    elif typename == "flags":
+enums, packets, structs = [], [], []
+for typ, header, lines, comment in sections:
+    # print("Parsing [%s] section.." % typ)
+    if typ == "enum":
+        enums.append(cortex.parse_enum(header, lines))
+    elif typ == "packet":
+        packets.append(cortex.parse_packet(header, lines))
+    elif typ == "struct":
+        structs.append(cortex.parse_struct(header, lines))
+    elif typ == "flags":
         pass
+    else:
+        print("Unknown section type [%s]" % typ)
 
-pprint(blocks)
+def section(name):
+    print(("[ %s ]" % name).center(80, "-"))
+
+section("enums")
+pprint(enums)
+section("packets")
+pprint(packets)
+section("structs")
+pprint(structs)
