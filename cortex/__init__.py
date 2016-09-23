@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
-import sys, os
 import re
-import fileinput
-from pprint import pprint
 
 RE_BLANK   = re.compile("^\s+$")
 RE_SECTION = re.compile("^(\w+)\s*(.*)$")
@@ -26,7 +23,6 @@ def parse_packet(header, lns):
     return [parse_case(c[0], c[2]) for c in parse(lines)]
 
 def parse(lines):
-
     def nextline(lines):
         try:
             return next(lines)
@@ -58,16 +54,3 @@ def parse(lines):
         else:
             raise ValueError("Unknown line: %r" % line)
     return sections
-
-sections = parse(fileinput.input())
-blocks = []
-for typename, header, lines in sections:
-    # print("Parsing [%s] section.." % typename)
-    if typename == "enum":
-        blocks.append(parse_enum(header, lines))
-    elif typename == "packet":
-        blocks.append(parse_packet(header, lines))
-    elif typename == "flags":
-        pass
-
-pprint(blocks)
