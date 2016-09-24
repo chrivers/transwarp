@@ -80,11 +80,13 @@ def parse_lines(lines):
 def parse(lines):
     parsers = {
         "enum": parse_enum,
+        "flags": parse_enum,
         "packet": parse_packet,
         "struct": parse_struct,
     }
 
     items = parse_lines(lines)
+
     res = {}
     for typ, header, section_lines, section_comment in items:
         if typ in parsers:
