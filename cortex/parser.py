@@ -14,7 +14,7 @@ def parse_enum(header, lines, comment):
         field = RE_ENUM_FIELD.match(line)
         name, value = field.groups()
         fields.append((name, int(value, 0)))
-    return (header, fields)
+    return (header, fields, comment)
 
 def parse_packet(header, lines, comment):
     return (header, [parse_struct(c[0], c[2], c[3]) for c in parse_lines(iter(lines))], comment)
@@ -33,7 +33,7 @@ def parse_struct(header, lines, comment):
             name, typ = field.groups()
             fields.append((name, typ, comment))
             comment = []
-    return (header, fields)
+    return (header, fields, comment)
 
 def parse_lines(lines):
     def nextline(lines):
