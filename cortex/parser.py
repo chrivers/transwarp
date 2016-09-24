@@ -7,7 +7,7 @@ RE_DOC     = re.compile("^#([^#].*)$")
 RE_SECTION = re.compile("^(\w+)\s*(.*)$")
 RE_FIELD   = re.compile("^    (.*)")
 
-def parse_enum(header, lines):
+def parse_enum(header, lines, comment):
     RE_ENUM_FIELD = re.compile("(\w+)\s*=\s*(\w+)")
     fields = []
     for line in lines:
@@ -16,13 +16,10 @@ def parse_enum(header, lines):
         fields.append((name, int(value, 0)))
     return (header, fields)
 
-def parse_case(name, lines):
-    return parse_struct(name, iter(lines))
+def parse_packet(header, lines, comment):
+    return (header, [parse_struct(c[0], c[2], c[3]) for c in parse_lines(iter(lines))], comment)
 
-def parse_packet(header, lines):
-    return (header, [parse_case(c[0], c[2]) for c in parse(iter(lines))])
-
-def parse_struct(header, lines):
+def parse_struct(header, lines, comment):
     RE_STRUCT_FIELD = re.compile("(\w+):\s*(.*)")
     fields = []
     comment = []
@@ -38,7 +35,7 @@ def parse_struct(header, lines):
             comment = []
     return (header, fields)
 
-def parse(lines):
+def parse_lines(lines):
     def nextline(lines):
         try:
             return next(lines)
@@ -80,8 +77,19 @@ def parse(lines):
             raise ValueError("Unknown line: %r" % line)
     return sections
 
-def organize(items):
+def parse(lines):
+    parsers = {
+        "enum": parse_enum,
+        "packet": parse_packet,
+        "struct": parse_struct,
+    }
+
+    items = parse_lines(lines)
     res = {}
-    for tup in items:
-        res.setdefault(tup[0], []).append(tup[1:])
+    for typ, header, section_lines, section_comment in items:
+        if typ in parsers:
+            parser = parsers[typ]
+            res.setdefault(typ, []).append(parser(header, section_lines, section_comment))
+        else:
+            print("Unknown type [%s]" % typ)
     return res
