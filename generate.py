@@ -16,4 +16,3 @@ except ImportError:
     sys.exit(2)
 
 language.generate(cortex, *sys.argv[2:])
-
