@@ -1,5 +1,4 @@
-from collections import OrderedDict
-
+from .data import SearchableList
 from .parser import parse_lines
 from .enum import Enum, Flags
 from .struct import Struct
@@ -21,8 +20,8 @@ def parse(lines):
         if typ in parsers:
             parser = parsers[typ]
             if not typ in res:
-                res[typ] = OrderedDict()
-            res[typ][header] = parser(header, section_lines, section_comment)
+                res[typ] = SearchableList()
+            res[typ].append(parser(header, section_lines, section_comment))
         else:
             raise ValueError("Unknown type [%s]" % typ)
     return res
