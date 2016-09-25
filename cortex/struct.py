@@ -1,6 +1,5 @@
 import re
 from .grammar import *
-from .parser import RE_DOC
 
 class Struct(object):
     def __init__(self, header, lines, comment):
