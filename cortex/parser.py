@@ -2,19 +2,12 @@
 
 import re
 
+from .enum import Enum
+
 RE_BLANK   = re.compile("^\s+$|^\s*##.*")
 RE_DOC     = re.compile("^#([^#].*)$")
 RE_SECTION = re.compile("^(\w+)\s*(.*)$")
 RE_FIELD   = re.compile("^    (.*)")
-
-def parse_enum(header, lines, comment):
-    RE_ENUM_FIELD = re.compile("(\w+)\s*=\s*(\w+)")
-    fields = []
-    for line in lines:
-        field = RE_ENUM_FIELD.match(line)
-        name, value = field.groups()
-        fields.append((name, int(value, 0)))
-    return (header, fields, comment)
 
 def parse_packet(header, lines, comment):
     return (header, [parse_struct(c[0], c[2], c[3]) for c in parse_lines(iter(lines))], comment)
@@ -79,8 +72,8 @@ def parse_lines(lines):
 
 def parse(lines):
     parsers = {
-        "enum": parse_enum,
-        "flags": parse_enum,
+        "enum": Enum,
+        "flags": Enum,
         "packet": parse_packet,
         "struct": parse_struct,
     }
