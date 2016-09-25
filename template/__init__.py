@@ -1,30 +1,27 @@
-import fileinput
-import glob
-import textwrap
 from mako.template import Template
 from mako import exceptions
+from mako.exceptions import RichTraceback
 
 import cortex
+import template.util
 
-def format_comment(comment, indent, width):
-    return textwrap.wrap(
-        "\n".join(comment),
-        initial_indent=indent,
-        subsequent_indent=indent,
-        width=width,
-    )
-
-def generate(tmpl):
-    files = glob.glob("data/*.stf")
-    sections = cortex.parse(fileinput.input(files))
-
-    template = Template(open(tmpl).read())
+def generate(tmpl, sections, lang_utils):
+    template = Template(tmpl)
     return template.render(**{
-            "enums": sections["enum"],
-            "flags": sections["flags"],
-            "packets": sections["packet"],
-            "structs": sections["struct"],
+        "enums": sections["enum"],
+        "flags": sections["flags"],
+        "packets": sections["packet"],
+        "structs": sections["struct"],
+        "objects": sections["object"],
 
-            "format_comment": format_comment,
-            "lang": __import__("rust")
+        "util": util,
+        "lang": lang_utils,
     }).rstrip("\n")
+
+def present_template_error():
+    traceback = RichTraceback()
+    filename, lineno, function, line = traceback.traceback[-1]
+    print("Error in template line %d:" % lineno)
+    print()
+    print(line)
+    print("  %s: %s" % (str(traceback.error.__class__.__name__), traceback.error))
