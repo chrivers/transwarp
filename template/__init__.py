@@ -7,4 +7,7 @@ def generate(cortex, tmpl):
     sections = cortex.parse(fileinput.input(files))
 
     template = Template(open(tmpl).read())
-    print(template.render(**{"enums": sections["enum"]}).rstrip("\n"))
+    print(template.render(**{
+        "enums": sections["enum"],
+        "flags": sections["flags"],
+    }).rstrip("\n"))
