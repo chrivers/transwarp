@@ -1,11 +1,11 @@
 import re
-from collections import OrderedDict
+from .data import SearchableList
 from .grammar import *
 
 class Struct(object):
     def __init__(self, header, lines, comment):
         RE_STRUCT_FIELD = re.compile("(\w+):\s*(.*)")
-        fields = OrderedDict()
+        fields = SearchableList()
         comment = []
         for line in lines:
             doc = RE_DOC.match(line)
@@ -15,7 +15,7 @@ class Struct(object):
             field = RE_STRUCT_FIELD.match(line)
             if field:
                 name, typ = field.groups()
-                fields[name] = Field(name, typ, comment)
+                fields.append(Field(name, typ, comment))
                 comment = []
         self._name = header
         self.fields = fields

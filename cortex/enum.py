@@ -1,4 +1,5 @@
 import re
+from .data import SearchableList
 from .strutil import text_width, hex_width
 
 class Enum(object):
@@ -14,7 +15,7 @@ class Enum(object):
         hw = hex_width(fields)
 
         self._name = header
-        self.fields = [Case(f[0], f[1], tw, hw) for f in fields]
+        self.fields = SearchableList([Case(f[0], f[1], tw, hw) for f in fields])
         self._comment = comment
 
     @property
