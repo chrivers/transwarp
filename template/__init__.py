@@ -5,7 +5,7 @@ from mako import exceptions
 from mako.exceptions import RichTraceback
 import textwrap
 
-def format_comment(comment, indent, width=80):
+def format_comment(comment, indent, width):
     return textwrap.wrap(
         "\n".join(comment),
         initial_indent=indent,
