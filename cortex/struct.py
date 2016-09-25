@@ -1,5 +1,6 @@
 import re
 from .data import SearchableList
+from .datatype import Type
 from .grammar import *
 
 class Struct(object):
@@ -14,12 +15,12 @@ class Struct(object):
                 continue
             field = RE_STRUCT_FIELD.match(line)
             if field:
-                name, typ = field.groups()
-                fields.append(Field(name, typ, comment))
+                name, datatype = field.groups()
+                fields.append(Field(name, Type(datatype), comment))
                 comment = []
         self._name = header
-        self.fields = fields
         self._comment = comment
+        self.fields = fields
 
     @property
     def name(self):
