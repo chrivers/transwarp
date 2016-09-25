@@ -2,7 +2,7 @@
 
 import re
 
-from .enum import Enum
+from .enum import Enum, Flags
 
 RE_BLANK   = re.compile("^\s+$|^\s*##.*")
 RE_DOC     = re.compile("^#([^#].*)$")
@@ -73,7 +73,7 @@ def parse_lines(lines):
 def parse(lines):
     parsers = {
         "enum": Enum,
-        "flags": Enum,
+        "flags": Flags,
         "packet": parse_packet,
         "struct": parse_struct,
     }
