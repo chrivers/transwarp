@@ -26,6 +26,7 @@ def generate(cortex, tmpl):
             "structs": sections["struct"],
 
             "format_comment": format_comment,
+            "lang": __import__("rust")
         }).rstrip("\n"))
     except:
         traceback = RichTraceback()
