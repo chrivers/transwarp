@@ -11,8 +11,8 @@ if len(sys.argv) < 3:
 
 try:
     language = __import__(sys.argv[1])
-except ImportError:
-    print("Could not load language [%s]" % sys.argv[1])
+except ImportError as E:
+    print("Could not load language [%s]: %s" % (sys.argv[1], E))
     sys.exit(2)
 
 language.generate(cortex, *sys.argv[2:])
