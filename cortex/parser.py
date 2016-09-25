@@ -3,11 +3,6 @@
 import re
 
 from .grammar import *
-from .enum import Enum, Flags
-from .struct import Struct
-
-def parse_packet(header, lines, comment):
-    return (header, [Struct(c[0], c[2], c[3]) for c in parse_lines(iter(lines))], comment)
 
 def parse_lines(lines):
     def nextline(lines):
@@ -51,21 +46,3 @@ def parse_lines(lines):
             raise ValueError("Unknown line: %r" % line)
     return sections
 
-def parse(lines):
-    parsers = {
-        "enum": Enum,
-        "flags": Flags,
-        "packet": parse_packet,
-        "struct": Struct,
-    }
-
-    items = parse_lines(lines)
-
-    res = {}
-    for typ, header, section_lines, section_comment in items:
-        if typ in parsers:
-            parser = parsers[typ]
-            res.setdefault(typ, []).append(parser(header, section_lines, section_comment))
-        else:
-            print("Unknown type [%s]" % typ)
-    return res
