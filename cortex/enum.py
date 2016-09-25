@@ -21,14 +21,6 @@ class Enum(object):
     def name(self):
         return self._name
 
-    @property
-    def value(self):
-        return self._name
-
-    @property
-    def name(self):
-        return self._name
-
 class Flags(Enum):
     pass
 
