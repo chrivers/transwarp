@@ -23,6 +23,8 @@ def generate(cortex, tmpl):
             "enums": sections["enum"],
             "flags": sections["flags"],
             "packets": sections["packet"],
+            "structs": sections["struct"],
+
             "format_comment": format_comment,
         }).rstrip("\n"))
     except:
