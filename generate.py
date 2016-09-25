@@ -2,17 +2,22 @@
 
 import sys, os
 import fileinput
-from pprint import pprint
 import cortex
+import template
+from pprint import pprint
+from mako.exceptions import RichTraceback
 
-if len(sys.argv) < 3:
-    print("usage: %s <language> <stf-files..>" % sys.argv[0])
+if len(sys.argv) != 2:
+    print("usage: %s <stf-file>" % sys.argv[0])
     sys.exit(1)
 
 try:
-    language = __import__(sys.argv[1])
-except ImportError as E:
-    print("Could not load language [%s]: %s" % (sys.argv[1], E))
-    sys.exit(2)
-
-language.generate(cortex, *sys.argv[2:])
+    template_file = sys.argv[1]
+    print(template.generate(template_file))
+except:
+    traceback = RichTraceback()
+    filename, lineno, function, line = traceback.traceback[-1]
+    print("Error in template line %d:" % lineno)
+    print()
+    print(line)
+    print("  %s: %s" % (str(traceback.error.__class__.__name__), traceback.error))
