@@ -11,6 +11,7 @@ def parse(lines):
         "flags": Flags,
         "packet": Packet,
         "struct": Struct,
+        "object": Struct,
     }
 
     items = parse_lines(lines)
@@ -23,5 +24,5 @@ def parse(lines):
                 res[typ] = OrderedDict()
             res[typ][header] = parser(header, section_lines, section_comment)
         else:
-            print("Unknown type [%s]" % typ)
+            raise ValueError("Unknown type [%s]" % typ)
     return res
