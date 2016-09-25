@@ -2,31 +2,12 @@
 
 import re
 
+from .grammar import *
 from .enum import Enum, Flags
-
-RE_BLANK   = re.compile("^\s+$|^\s*##.*")
-RE_DOC     = re.compile("^#([^#].*)$")
-RE_SECTION = re.compile("^(\w+)\s*(.*)$")
-RE_FIELD   = re.compile("^    (.*)")
+from .struct import Struct
 
 def parse_packet(header, lines, comment):
-    return (header, [parse_struct(c[0], c[2], c[3]) for c in parse_lines(iter(lines))], comment)
-
-def parse_struct(header, lines, comment):
-    RE_STRUCT_FIELD = re.compile("(\w+):\s*(.*)")
-    fields = []
-    comment = []
-    for line in lines:
-        doc = RE_DOC.match(line)
-        if doc:
-            comment.append(doc.group(1).strip())
-            continue
-        field = RE_STRUCT_FIELD.match(line)
-        if field:
-            name, typ = field.groups()
-            fields.append((name, typ, comment))
-            comment = []
-    return (header, fields, comment)
+    return (header, [Struct(c[0], c[2], c[3]) for c in parse_lines(iter(lines))], comment)
 
 def parse_lines(lines):
     def nextline(lines):
@@ -75,7 +56,7 @@ def parse(lines):
         "enum": Enum,
         "flags": Flags,
         "packet": parse_packet,
-        "struct": parse_struct,
+        "struct": Struct,
     }
 
     items = parse_lines(lines)
