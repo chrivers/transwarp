@@ -4,3 +4,4 @@ class SearchableList(list):
         for x in self:
             if x.name == name:
                 return x
+        raise KeyError("Could not find element with name [%s]" % name)
