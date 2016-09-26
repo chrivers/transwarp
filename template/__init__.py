@@ -6,6 +6,16 @@ import cortex
 import cortex.data
 import template.util
 
+import fnmatch
+import os
+
+def find_available_templates():
+    matches = []
+    for root, dirnames, filenames in os.walk('.'):
+        for filename in fnmatch.filter(filenames, '*.tpl'):
+            matches.append(os.path.join(os.path.normpath(root), filename))
+    return matches
+
 def generate(tmpl, sections):
     template = Template(tmpl)
     empty = cortex.data.SearchableList()
