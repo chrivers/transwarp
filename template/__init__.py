@@ -21,9 +21,4 @@ def generate(tmpl, sections, lang_utils):
     }).rstrip("\n")
 
 def present_template_error():
-    traceback = RichTraceback()
-    filename, lineno, function, line = traceback.traceback[-1]
-    print("Error in template line %d:" % lineno)
-    print()
-    print(line)
-    print("  %s: %s" % (str(traceback.error.__class__.__name__), traceback.error))
+    print(exceptions.text_error_template().render())
