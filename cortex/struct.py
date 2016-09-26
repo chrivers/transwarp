@@ -6,6 +6,8 @@ from .base import SectionObject
 
 class Struct(SectionObject):
     def __init__(self, header, lines, comment):
+        self._cmt = comment
+        self._name = header
         fields = []
         comment = []
         for line in lines:
@@ -19,8 +21,6 @@ class Struct(SectionObject):
                 fields.append((name, type, comment))
                 comment = []
         tw = text_width(fields)
-        self._name = header
-        self._cmt = comment
         self._tw = tw
         self.fields = SearchableList([Field(name, Type(type), cmt) for (name, type, cmt) in fields])
 
