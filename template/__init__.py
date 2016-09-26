@@ -3,16 +3,18 @@ from mako import exceptions
 from mako.exceptions import RichTraceback
 
 import cortex
+import cortex.data
 import template.util
 
 def generate(tmpl, sections, lang_utils):
     template = Template(tmpl)
+    empty = cortex.data.SearchableList()
     return template.render(**{
-        "enums": sections["enum"],
-        "flags": sections["flags"],
-        "packets": sections["packet"],
-        "structs": sections["struct"],
-        "objects": sections["object"],
+        "enums": sections.get("enum", empty),
+        "flags": sections.get("flags", empty),
+        "packets": sections.get("packet", empty),
+        "structs": sections.get("struct", empty),
+        "objects": sections.get("object", empty),
 
         "util": util,
         "lang": lang_utils,
