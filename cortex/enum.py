@@ -1,8 +1,9 @@
 from .grammar import RE_ENUM_FIELD
 from .data import SearchableList
 from .strutil import text_width, hex_width
+from .base import SectionObject
 
-class Enum(object):
+class Enum(SectionObject):
     def __init__(self, header, lines, comment):
         fields = []
         for line in lines:
@@ -16,17 +17,13 @@ class Enum(object):
         self.fields = SearchableList([Case(f[0], f[1], tw, hw) for f in fields])
         self._comment = comment
 
-    @property
-    def name(self):
-        return self._name
-
 class Flags(Enum):
     pass
 
-class Case(object):
+class Case(SectionObject):
     def __init__(self, name, value, name_width, value_width):
-        self.name = name
-        self.value = value
+        self._name = name
+        self._value = value
         self._name_width = name_width
         self._value_width = value_width
 
@@ -36,8 +33,8 @@ class Case(object):
 
     @property
     def hex_value(self):
-        return "0x{:x}".format(self.value)
+        return "0x{:x}".format(self._value)
 
     @property
     def aligned_hex_value(self):
-        return "0x{:0{width}x}".format(self.value, width=self._value_width)
+        return "0x{:0{width}x}".format(self._value, width=self._value_width)

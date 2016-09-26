@@ -3,8 +3,9 @@ from .data import SearchableList
 from .grammar import *
 from .parser import parse_lines
 from .struct import Struct
+from .base import SectionObject
 
-class Packet(object):
+class Packet(SectionObject):
     def __init__(self, header, lines, comment):
         fields = SearchableList()
         for item in parse_lines(iter(lines)):

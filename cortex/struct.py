@@ -1,8 +1,9 @@
 from .data import SearchableList
 from .datatype import Type
 from .grammar import RE_STRUCT_FIELD, RE_DOC
+from .base import SectionObject
 
-class Struct(object):
+class Struct(SectionObject):
     def __init__(self, header, lines, comment):
         fields = SearchableList()
         comment = []
@@ -20,19 +21,11 @@ class Struct(object):
         self._comment = comment
         self.fields = fields
 
-    @property
-    def name(self):
-        return self._name
-
-class Field(object):
+class Field(SectionObject):
     def __init__(self, name, datatype, cmt):
         self._name = name
         self._type = datatype
         self._cmt = cmt
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def type(self):

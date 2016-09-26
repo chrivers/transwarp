@@ -1,6 +1,7 @@
 from .grammar import RE_TYPE
+from .base import SectionObject
 
-class Type(object):
+class Type(SectionObject):
     def __init__(self, text):
         match = RE_TYPE.match(text)
         if not match:
@@ -19,10 +20,6 @@ class Type(object):
         else:
             self._arg = arg0
             self._target = None
-
-    @property
-    def name(self):
-        return self._name
 
     @property
     def target(self):
