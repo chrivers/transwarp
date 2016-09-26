@@ -1,11 +1,9 @@
-import re
+from .grammar import RE_ENUM_FIELD
 from .data import SearchableList
 from .strutil import text_width, hex_width
 
 class Enum(object):
     def __init__(self, header, lines, comment):
-        RE_ENUM_FIELD = re.compile("(\w+)\s*=\s*(\w+)")
-
         fields = []
         for line in lines:
             field = RE_ENUM_FIELD.match(line)

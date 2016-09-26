@@ -1,8 +1,7 @@
-import re
+from .grammar import RE_TYPE
 
 class Type(object):
     def __init__(self, text):
-        RE_TYPE = re.compile("(\w+)(?:<(?:(.+?)(?:,\s*(.+))?)>)?$")
         match = RE_TYPE.match(text)
         if not match:
             raise ValueError("Could not parse type [%r]" % text)

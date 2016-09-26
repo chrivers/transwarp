@@ -1,11 +1,9 @@
-import re
 from .data import SearchableList
 from .datatype import Type
-from .grammar import *
+from .grammar import RE_STRUCT_FIELD, RE_DOC
 
 class Struct(object):
     def __init__(self, header, lines, comment):
-        RE_STRUCT_FIELD = re.compile("(\w+):\s*(.*)")
         fields = SearchableList()
         comment = []
         for line in lines:
