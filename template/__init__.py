@@ -6,7 +6,7 @@ import cortex
 import cortex.data
 import template.util
 
-def generate(tmpl, sections, lang_utils):
+def generate(tmpl, sections):
     template = Template(tmpl)
     empty = cortex.data.SearchableList()
     return template.render(**{
@@ -17,7 +17,6 @@ def generate(tmpl, sections, lang_utils):
         "objects": sections.get("object", empty),
 
         "util": util,
-        "lang": lang_utils,
     }).rstrip("\n")
 
 def present_template_error():
