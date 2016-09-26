@@ -1,11 +1,12 @@
 from .data import SearchableList
 from .datatype import Type
 from .grammar import RE_STRUCT_FIELD, RE_DOC
+from .strutil import text_width
 from .base import SectionObject
 
 class Struct(SectionObject):
     def __init__(self, header, lines, comment):
-        fields = SearchableList()
+        fields = []
         comment = []
         for line in lines:
             doc = RE_DOC.match(line)
@@ -14,12 +15,22 @@ class Struct(SectionObject):
                 continue
             field = RE_STRUCT_FIELD.match(line)
             if field:
-                name, datatype = field.groups()
-                fields.append(Field(name, Type(datatype), comment))
+                name, type = field.groups()
+                fields.append((name, type, comment))
                 comment = []
+        tw = text_width(fields)
         self._name = header
-        self._comment = comment
-        self.fields = fields
+        self._cmt = comment
+        self._tw = tw
+        self.fields = SearchableList([Field(name, Type(type), cmt) for (name, type, cmt) in fields])
+
+    @property
+    def comment(self):
+        return self._cmt
+
+    @property
+    def text_width(self):
+        return self._tw
 
 class Field(SectionObject):
     def __init__(self, name, datatype, cmt):
