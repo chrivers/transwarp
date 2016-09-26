@@ -1,4 +1,4 @@
-MIN_TEXT_WIDTH = 20
+MIN_TEXT_WIDTH = 0
 MIN_HEX_WIDTH = 2
 
 def text_width(cases):
