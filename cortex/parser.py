@@ -20,7 +20,7 @@ def parse_lines(lines):
             continue
         docline = RE_DOC.match(line)
         if docline:
-            comment.append(docline.group(1))
+            comment.append(docline.group(1).strip())
             line = nextline(lines)
             continue
 
