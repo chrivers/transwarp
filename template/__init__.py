@@ -1,3 +1,4 @@
+import sys
 from mako.template import Template
 from mako import exceptions
 from mako.exceptions import RichTraceback
@@ -29,4 +30,4 @@ def generate(tmpl, sections):
     }).rstrip("\n")
 
 def present_template_error():
-    print(exceptions.text_error_template().render())
+    print(exceptions.text_error_template().render(), file=sys.stderr)
