@@ -2,45 +2,33 @@ import re
 
 class Type(object):
     def __init__(self, text):
-        RE_TYPE = re.compile("(\w+)(?:<(.+)(?:, (.+))?>)?")
+        RE_TYPE = re.compile("(\w+)(?:<(?:(.+?)(?:,\s*(.+))?)>)?$")
         match = RE_TYPE.match(text)
         if not match:
             raise ValueError("Could not parse type [%r]" % text)
-        name, target, arg = match.groups()
+        name, arg0, arg1 = match.groups()
         self._name = name
-        self._target = Type(target)
-        self._arg = arg
+        if name == "map":
+            self._arg    = arg0
+            self._target = Type(arg1)
+        elif name in ("enum8", "enum32", "array", "option"):
+            self._target = Type(arg0)
+            self._arg = arg1
+        elif name == "sizedarray":
+            self._target = Type(arg0)
+            self._arg = int(arg1)
+        else:
+            self._arg = arg0
+            self._target = None
 
     @property
     def name(self):
         return self._name
 
-class FixedArray(Type):
-
-    def __init__(self, name, type, length):
-        self._name = name
-        self._type = type
-        self._length = length
+    @property
+    def target(self):
+        return self._target
 
     @property
-    def type(self):
-        return self._type
-
-    @property
-    def length(self):
-        return self._length
-
-class Array(Type):
-
-    def __init__(self, name, type, length):
-        self._name = name
-        self._type = type
-        self._length = length
-
-    @property
-    def type(self):
-        return self._type
-
-    @property
-    def length(self):
-        return self._length
+    def arg(self):
+        return self._arg
