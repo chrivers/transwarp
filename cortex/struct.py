@@ -33,9 +33,9 @@ class Struct(SectionObject):
         return self._tw
 
 class Field(SectionObject):
-    def __init__(self, name, datatype, cmt):
+    def __init__(self, name, type, cmt):
         self._name = name
-        self._type = datatype
+        self._type = type
         self._cmt = cmt
 
     @property
