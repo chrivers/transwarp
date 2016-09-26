@@ -28,3 +28,4 @@ try:
     print(template.generate(template_data, sections))
 except:
     template.present_template_error()
+    sys.exit(10)
