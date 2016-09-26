@@ -6,10 +6,9 @@ import cortex
 import cortex.data
 import template.util
 
-import fnmatch
-import os
-
-def find_available_templates():
+def find_available():
+    import os
+    import fnmatch
     matches = []
     for root, dirnames, filenames in os.walk('.'):
         for filename in fnmatch.filter(filenames, '*.tpl'):

@@ -9,7 +9,7 @@ import template
 if len(sys.argv) != 2:
     print("usage: %s <tpl-file>" % sys.argv[0])
     print("Available template files:")
-    for name in sorted(template.find_available_templates()):
+    for name in sorted(template.find_available()):
         print("  %s" % name)
     sys.exit(1)
 
