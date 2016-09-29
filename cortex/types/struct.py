@@ -1,8 +1,8 @@
-from .data import SearchableList
+from ..data import SearchableList
+from ..grammar import RE_STRUCT_FIELD, RE_DOC
+from ..strutil import text_width
 from .datatype import Type
-from .grammar import RE_STRUCT_FIELD, RE_DOC
-from .strutil import text_width
-from .base import SectionObject
+from . import SectionObject
 
 class Struct(SectionObject):
     def __init__(self, header, lines, comment):

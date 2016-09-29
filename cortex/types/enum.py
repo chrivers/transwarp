@@ -1,7 +1,7 @@
-from .grammar import RE_ENUM_FIELD
-from .data import SearchableList
-from .strutil import text_width, hex_width
-from .base import SectionObject
+from ..grammar import RE_ENUM_FIELD
+from ..data import SearchableList
+from ..strutil import text_width, hex_width
+from . import SectionObject
 
 class Enum(SectionObject):
     def __init__(self, header, lines, comment):

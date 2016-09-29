@@ -1,8 +1,8 @@
 from .data import SearchableList
 from .parser import parse_lines
-from .enum import Enum, Flags
-from .struct import Struct
-from .packet import Packet
+from .types.enum import Enum, Flags
+from .types.struct import Struct
+from .types.packet import Packet
 
 def parse(lines):
     parsers = {

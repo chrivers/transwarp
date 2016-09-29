@@ -1,5 +1,5 @@
-from .grammar import RE_TYPE
-from .base import SectionObject
+from ..grammar import RE_TYPE
+from . import SectionObject
 
 class Type(SectionObject):
     def __init__(self, text):

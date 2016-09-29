@@ -1,9 +1,8 @@
-import re
-from .data import SearchableList
-from .grammar import *
-from .parser import parse_lines
+from ..data import SearchableList
+from ..grammar import *
+from ..parser import parse_lines
 from .struct import Struct
-from .base import SectionObject
+from . import SectionObject
 
 class Packet(SectionObject):
     def __init__(self, header, lines, comment):
