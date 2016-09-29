@@ -25,6 +25,7 @@ def generate(tmpl, sections):
         "packets": sections.get("packet", empty),
         "structs": sections.get("struct", empty),
         "objects": sections.get("object", empty),
+        "parsers": sections.get("parser", empty),
 
         "util": util,
     }).rstrip("\n")
