@@ -15,5 +15,5 @@ class Parser(Struct):
             raise ValueError("Invalid parser definition: [%r]" % header)
 
     @property
-    def match(self):
+    def arg(self):
         return self._match
