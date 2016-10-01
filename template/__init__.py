@@ -5,7 +5,7 @@ from mako.exceptions import RichTraceback
 
 import cortex
 import cortex.data
-import template.util
+import template.util as tmplutil
 
 def find_available():
     import os
@@ -19,7 +19,7 @@ def find_available():
 def generate(tmpl, sections):
     template = Template(tmpl)
     empty = cortex.data.SearchableList()
-    return template.render(**{
+    context = {
         "enums": sections.get("enum", empty),
         "flags": sections.get("flags", empty),
         "packets": sections.get("packet", empty),
@@ -28,7 +28,11 @@ def generate(tmpl, sections):
         "parsers": sections.get("parser", empty),
 
         "util": util,
-    }).rstrip("\n")
+    }
+    tmplutil._set_context(context)
+    result = template.render(**context).rstrip("\n")
+    tmplutil._set_context(None)
+    return result
 
 def present_template_error():
     print(exceptions.text_error_template().render(), file=sys.stderr)

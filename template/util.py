@@ -1,5 +1,14 @@
 import textwrap
 
+__context = None
+
+def _set_context(ctx):
+    global __context
+    __context = ctx
+
+def get_context():
+    return __context
+
 def format_comment(comment, indent, width):
     res = []
     for line in comment:
