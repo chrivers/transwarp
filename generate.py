@@ -27,6 +27,7 @@ try:
     # templates can inspect
     sections = cortex.parse(all_lines)
 
+    print("Compiling [%s]" % template_file, file=sys.stderr)
     # generate the template, and print it
     print(template.generate(template_data, sections))
 except:
