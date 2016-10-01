@@ -4,6 +4,7 @@ from .types.enum import Enum, Flags
 from .types.struct import Struct
 from .types.parser import Parser
 from .types.packet import Packet
+from .types.object import Object
 
 def parse(lines):
     parsers = {
@@ -11,7 +12,7 @@ def parse(lines):
         "flags": Flags,
         "packet": Packet,
         "struct": Struct,
-        "object": Struct,
+        "object": Object,
         "parser": Parser,
     }
 
