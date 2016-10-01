@@ -28,7 +28,7 @@ try:
     sections = cortex.parse(all_lines)
 
     # generate the template, and print it
-    print(template.generate(template_data, sections), end="")
+    print(template.generate(template_data, sections))
 except:
     template.present_template_error()
     sys.exit(10)

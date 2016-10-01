@@ -28,7 +28,7 @@ def generate(tmpl, sections):
         "parsers": sections.get("parser", empty),
 
         "util": util,
-    })
+    }).rstrip("\n")
 
 def present_template_error():
     print(exceptions.text_error_template().render(), file=sys.stderr)
