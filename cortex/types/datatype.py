@@ -6,25 +6,26 @@ class Type(SectionObject):
         match = RE_TYPE.match(text)
         if not match:
             raise ValueError("Could not parse type [%r]" % text)
-        name, arg0, arg1 = match.groups()
+        name, argstr = match.groups()
+        pargs = []
+        while argstr:
+            match = RE_TYPE.match(argstr)
+            if match:
+                a, b = match.span()
+                pargs.append(Type(argstr[a:b]))
+                argstr = argstr[b:].strip()
+                if argstr.startswith(","):
+                    argstr = argstr[1:].lstrip()
+            else:
+                raise ValueError("Could not parse type argument [%r]" % argstr)
+                break
+
         self._name = name
-        if name == "map":
-            self._arg    = arg0
-            self._target = Type(arg1)
-        elif name in ("enum8", "enum32", "array", "option"):
-            self._target = Type(arg0)
-            self._arg = arg1
-        elif name == "sizedarray":
-            self._target = Type(arg0)
-            self._arg = int(arg1)
-        else:
-            self._arg = arg0
-            self._target = None
+        self._args = pargs
 
-    @property
-    def target(self):
-        return self._target
+    def arg(self, idx):
+        if idx < len(self._args):
+            return self._args[idx]
 
-    @property
-    def arg(self):
-        return self._arg
+    def ref(self, arg):
+        return "[%s as %s]" % (self.name, arg)
