@@ -1,13 +1,13 @@
 import textwrap
 
-__context = None
+context = None
 
 def _set_context(ctx):
-    global __context
-    __context = ctx
+    global context
+    context = ctx
 
-def get_context():
-    return __context
+def _get_context():
+    return context
 
 def format_comment(comment, indent, width):
     res = []
