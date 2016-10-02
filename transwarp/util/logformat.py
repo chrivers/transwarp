@@ -61,7 +61,7 @@ class Formatter(object):
         )
 
 def set_level(level):
-    loggin.getLogger().setLevel(level)
+    logging.getLogger().setLevel(level)
 
 def initialize(level=logging.INFO, **kwargs):
     fmt = Formatter(**kwargs)
