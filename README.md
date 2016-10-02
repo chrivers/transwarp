@@ -41,6 +41,28 @@ use the available data. More importantly, you can start by making your
 existing source files into templates, and slowly build conversion
 logic into them!
 
+## Quick start ##
+
+Okay, so you want to try out transwarp! Here's what you need:
+
+ 0. python 3
+ 0. The transwarp compiler (https://github.com/chrivers/transwarp)
+ 0. A protocol specification (for example, https://github.com/chrivers/isolinear-chips)
+ 0. Templates for that protocol (for example, https://github.com/chrivers/duranium-templates)
+
+```bash
+# download and install transwarp
+$ git clone https:/a/github.com/chrivers/transwarp
+$ cd transwarp
+$ ./setup.py install # use sudo if you want to install system-wide
+
+# as an example, get artemis protocol spec
+$ git clone https://github.com/chrivers/isolinear-chips protocol
+
+# as an example, get rust code templates
+$ git clone https://github.com/chrivers/duranium-templates templates
+```
+
 ## STF specifications ##
 
 The input data format, boringly named Simple Type Framework (.stf), is
@@ -137,3 +159,40 @@ object Torpedo(2)
 In this example, a `Torpedo` object is defined, with the parameter
 `2`. Except for the definition line, the syntax for `object` is
 exactly equal to `struct`
+
+### Packets ###
+
+One of the last section types is `packet`, which is the only section
+type that has two levels. It allows you to describe a multiple-choice
+type situation, where each individual case works like a struct. It
+looks like this:
+
+```capnp
+packet ClientPacket
+    ActivateUpgrade
+        # The upgrade to activate. The game is prepared for 28 (30?)
+        # different types of powerups, but only 8 are available as
+        # of Artemis 2.4.
+        target: enum<u32, UpgradeActivation>
+
+    AudioCommand
+        # The ID for the audio message. This is given by the
+        # IncomingAudioPacket.
+        audio_id: i32
+
+        # The desired action to perform.
+        audio_command: enum<u32, AudioCommand>
+
+    CaptainSelect
+        # The object ID for the new target, or 1 if the target has been cleared.
+        target_id: i32
+```
+
+Here we see a packet definition for `ClientPacket`, with 3 cases. Each
+case is then specified just like a `struct`.
+
+### Parsers ###
+
+
+
+### Types ###
