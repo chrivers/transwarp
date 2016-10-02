@@ -41,7 +41,7 @@ class Formatter(object):
             return "%s%s " % (self.color("fg_white"), datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         else:
             return ""
-        
+
     def format(self, record):
         level = record.levelno
         if record.name == "root":
@@ -60,7 +60,10 @@ class Formatter(object):
             record.msg
         )
 
-def initialize(level, **kwargs):
+def set_level(level):
+    loggin.getLogger().setLevel(level)
+
+def initialize(level=logging.INFO, **kwargs):
     fmt = Formatter(**kwargs)
     logging.basicConfig(level=level)
     logging.getLogger().handlers[0].setFormatter(fmt)
