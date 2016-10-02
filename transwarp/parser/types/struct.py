@@ -1,4 +1,4 @@
-from ..data import SearchableList
+from transwarp.util.data import SearchableList
 from ..grammar import RE_STRUCT_FIELD, RE_DOC
 from ..strutil import text_width
 from .datatype import Type

@@ -1,4 +1,4 @@
-from ..data import SearchableList
+from transwarp.util.data import SearchableList
 from ..grammar import *
 from ..parser import parse_lines
 from .struct import Struct

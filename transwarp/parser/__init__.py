@@ -1,4 +1,4 @@
-from .data import SearchableList
+from transwarp.util.data import SearchableList
 from .parser import parse_lines
 from .types.enum import Enum, Flags
 from .types.struct import Struct

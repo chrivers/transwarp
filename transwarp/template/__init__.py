@@ -1,11 +1,22 @@
 import sys
-from mako.template import Template
+
 from mako import exceptions
+from mako.template import Template
 from mako.exceptions import RichTraceback
 
-import cortex
-import cortex.data
-import template.util as tmplutil
+import transwarp.parser
+from transwarp.util.data import SearchableList
+import transwarp.template
+import transwarp.template.util
+
+context = None
+
+def _set_context(ctx):
+    global context
+    context = ctx
+
+def _get_context():
+    return context
 
 def find_available():
     import os
@@ -18,7 +29,7 @@ def find_available():
 
 def generate(tmpl, sections):
     template = Template(tmpl)
-    empty = cortex.data.SearchableList()
+    empty = SearchableList()
     context = {
         "enums": sections.get("enum", empty),
         "flags": sections.get("flags", empty),
@@ -27,11 +38,11 @@ def generate(tmpl, sections):
         "objects": sections.get("object", empty),
         "parsers": sections.get("parser", empty),
 
-        "util": util,
+        "util": transwarp.template.util,
     }
-    tmplutil._set_context(context)
+    _set_context(context)
     result = template.render(**context).rstrip("\n")
-    tmplutil._set_context(None)
+    _set_context(None)
     return result
 
 def present_template_error():
