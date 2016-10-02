@@ -85,6 +85,10 @@ def parse_and_validate():
 
         if not args.datadir:
             raise ValueError("datadir (-D) is required")
+        # if args.inputdir and args.outputdir:
+        #     raise ValueError("output dir (-O) is required with input dir (-I)")
+        # if args.outputdir and args.inputdir:
+        #     raise ValueError("input dir (-I) is required with output dir (-O)")
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)
