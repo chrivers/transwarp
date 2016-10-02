@@ -43,8 +43,7 @@ def generate(tmpl, sections, link_paths):
     }
     with mako_context(context):
         with scoped_search_paths(link_paths):
-            result = template.render(**context).rstrip("\n")
-    return result
+            return template.render(**context)
 
 def present_template_error():
     print(exceptions.text_error_template().render(), file=sys.stderr)
