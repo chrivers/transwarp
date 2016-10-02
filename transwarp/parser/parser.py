@@ -1,8 +1,4 @@
-#!/usr/bin/python3
-
-import re
-
-from .grammar import *
+from transwarp.parser.grammar import *
 
 def parse_lines(lines):
     def nextline(lines):

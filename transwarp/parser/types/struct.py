@@ -1,8 +1,8 @@
 from transwarp.util.data import SearchableList
-from ..grammar import RE_STRUCT_FIELD, RE_DOC
-from ..strutil import text_width
-from .datatype import Type
-from . import SectionObject
+from transwarp.parser.grammar import RE_STRUCT_FIELD, RE_DOC
+from transwarp.parser.strutil import text_width
+from transwarp.parser.types.datatype import Type
+from transwarp.parser.types import SectionObject
 
 class Struct(SectionObject):
     def __init__(self, header, lines, comment):
