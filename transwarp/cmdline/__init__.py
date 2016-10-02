@@ -1,6 +1,7 @@
 import os
 import sys
 import glob
+import enum
 import tempfile
 import fileinput
 import subprocess
@@ -33,6 +34,17 @@ def path_remove_ext(path, ext):
 def output_file_name(name):
     return path_remove_ext(name, DEFAULT_TEMPLATE_EXTENSION)
 
+def reverse_dict(data):
+    res = {}
+    for key, value in data.items():
+        res.setdefault(value, []).append(key)
+    return res
+
+class Status(enum.Enum):
+    missing = 1
+    stale   = 2
+    fresh   = 3
+
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
@@ -49,16 +61,15 @@ def main(args=None):
 
     if args.force:
         log.debug("forcing all templates (--force)")
-        missing, updated = templates, []
+        status = dict.fromkeys(templates, Status.stale)
     else:
-        missing, updated = check_freshness(args.inputdir, args.outputdir, templates)
+        status = check_freshness(args.inputdir, args.outputdir, templates)
 
-    targets = set(missing) | set(updated)
-    if not targets:
+    if not set(status.values()) - set([Status.fresh]):
         log.info("All templates up-to-date")
     elif args.action == "update":
-        log.info("Compiling %d of %d templates" % (len(targets), len(templates)))
-        for target in targets:
+        log.info("Compiling %d of %d templates" % (len(status), len(templates)))
+        for target in status:
             compile_template(
                 sections,
                 path_join(args.inputdir, target),
@@ -66,8 +77,8 @@ def main(args=None):
                 args.linkdir,
             )
     elif args.action in ("diff", "word-diff"):
-        log.info("Diffing %d of %d templates" % (len(targets), len(templates)))
-        for target in targets:
+        log.info("Diffing %d of %d templates" % (len(status), len(templates)))
+        for target in status:
             diff_template(
                 sections,
                 path_join(args.inputdir, target),
@@ -75,6 +86,20 @@ def main(args=None):
                 args.linkdir,
                 word_diff_mode=(args.action == "word-diff")
             )
+    elif args.action in ("summary"):
+        groups = reverse_dict(status)
+        if Status.missing in groups:
+            log.info("Will create:")
+            for target in sorted(groups[Status.missing]):
+                print("    %s" % target)
+        if Status.stale in groups:
+            log.info("Will update:")
+            for target in sorted(groups[Status.stale]):
+                print("    %s" % target)
+        if Status.fresh in groups:
+            log.info("Up to date:")
+            for target in sorted(groups[Status.fresh]):
+                print("    %s" % target)
     else:
         raise NotImplementedError("Unknown action [%s]" % args.action)
 
@@ -82,7 +107,7 @@ def get_timestamp(filename):
     return datetime.fromtimestamp(os.stat(filename).st_mtime)
 
 def check_freshness(idir, odir, templates):
-    missing, updated = [], []
+    status = {}
     log.debug("scanning for templates to compile:")
     for name in templates:
         ifile = path_join(idir, name)
@@ -91,15 +116,16 @@ def check_freshness(idir, odir, templates):
             otime = get_timestamp(ofile)
         except OSError:
             log.debug("  template %s: not found" % ofile)
-            missing.append(name)
+            status[name] = Status.missing
             continue
 
         if get_timestamp(ifile) > otime:
-            updated.append(name)
+            status[name] = Status.stale
             log.debug("  template %s: stale" % ofile)
         else:
+            status[name] = Status.fresh
             log.debug("  template %s: fresh" % ofile)
-    return missing, updated
+    return status
 
 def find_template_files(path, extension=DEFAULT_TEMPLATE_EXTENSION):
     path = path_normalize(path)

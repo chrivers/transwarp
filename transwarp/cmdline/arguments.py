@@ -65,6 +65,15 @@ _output.add_argument(
 )
 
 _output.add_argument(
+    "-s", "--summary",
+    action="store_const",
+    const="summary",
+    dest="action",
+    default="summary",
+    help="Summary mode (show changed/fresh files without diffs)",
+)
+
+_output.add_argument(
     "-u", "--update",
     action="store_const",
     const="update",
