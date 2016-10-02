@@ -16,15 +16,6 @@ from transwarp.cmdline.pathutils import *
 
 DEFAULT_TEMPLATE_EXTENSION = ".tpl"
 
-def output_file_name(name):
-    return path_remove_ext(name, DEFAULT_TEMPLATE_EXTENSION)
-
-def reverse_dict(data):
-    res = {}
-    for key, value in data.items():
-        res.setdefault(value, []).append(key)
-    return res
-
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
@@ -40,48 +31,48 @@ def main(args=None):
     sections = transwarp.parser.parse(all_lines)
 
     log.debug("Searching for templates in: %s" % args.inputdir)
-    if not changes.find_templates(args.inputdir):
+    if not changes.find_templates(args.inputdir, newest_date):
         log.error("No templates found (searched for %s in '%s')" % (DEFAULT_TEMPLATE_EXTENSION, args.inputdir))
         log.error("  hint: you can specify target dir with -I <path>")
         return False
 
     changes.find_modifications()
 
-    if not set(status.values()) - set([Status.fresh]):
+    groups = changes.grouped()
+    if not changes:
         log.info("All templates up-to-date")
     elif args.action == "update":
-        log.info("Compiling %d of %d templates" % (len(status), len(templates)))
-        for target in status:
+        log.info("Compiling %d of %d templates" % (len(changes), len(changes.templates)))
+        for target in changes:
             compile_template(
                 sections,
-                path_join(args.inputdir, target),
-                output_file_name(path_join(args.outputdir, target)),
+                target.input_file,
+                target.output_file,
                 args.linkdir,
             )
     elif args.action in ("diff", "word-diff"):
-        log.info("Diffing %d of %d templates" % (len(status), len(templates)))
-        for target in status:
+        log.info("Diffing %d of %d templates" % (len(changes), len(changes.templates)))
+        for target in changes:
             diff_template(
                 sections,
-                path_join(args.inputdir, target),
-                output_file_name(path_join(args.outputdir, target)),
+                target.input_file,
+                target.output_file,
                 args.linkdir,
                 word_diff_mode=(args.action == "word-diff")
             )
     elif args.action in ("summary"):
-        groups = reverse_dict(status)
         if Status.missing in groups:
             log.info("Will create:")
             for target in sorted(groups[Status.missing]):
-                print("    %s" % output_file_name(target))
+                print("    %s" % target.output_file)
         if Status.stale in groups:
             log.info("Will update:")
             for target in sorted(groups[Status.stale]):
-                print("    %s" % output_file_name(target))
+                print("    %s" % target.output_file)
         if Status.fresh in groups:
             log.info("Up to date:")
             for target in sorted(groups[Status.fresh]):
-                print("    %s" % output_file_name(target))
+                print("    %s" % target.output_file)
     else:
         raise NotImplementedError("Unknown action [%s]" % args.action)
 
