@@ -36,10 +36,11 @@ def main(args=None):
 
     if args.all:
         log.debug("using all templates (--all)")
-        targets = templates
+        missing, updated = templates, []
     else:
-        targets = check_freshness(args.inputdir, args.outputdir, templates)
+        missing, updated = check_freshness(args.inputdir, args.outputdir, templates)
 
+    targets = set(missing) | set(updated)
     if targets:
         log.info("Compiling %d of %d templates" % (len(targets), len(templates)))
         for target in targets:
@@ -55,7 +56,7 @@ def get_timestamp(filename):
     return datetime.fromtimestamp(os.stat(filename).st_mtime)
 
 def check_freshness(idir, odir, templates):
-    res = []
+    missing, updated = [], []
     log.debug("scanning for templates to compile:")
     for name in templates:
         ifile = path_join(idir, name)
@@ -64,15 +65,15 @@ def check_freshness(idir, odir, templates):
             otime = get_timestamp(ofile)
         except OSError:
             log.debug("  template %s: not found" % ofile)
-            res.append(ofile)
+            missing.append(name)
             continue
 
         if get_timestamp(ifile) > otime:
-            res.append(ofile)
+            res.append(name)
             log.debug("  template %s: stale" % ofile)
         else:
             log.debug("  template %s: fresh" % ofile)
-    return res
+    return missing, updated
 
 def find_template_files(path, extension_glob=DEFAULT_TEMPLATE_EXTENSION):
     path = path_normalize(path)
@@ -99,9 +100,14 @@ def find_stf_files(datadir):
         raise LookupError("Could not find any .stf files in %r" % datadir)
 
 def compile_template(data, input_file, output_file):
+    target_dir = os.path.dirname(output_file)
+    os.makedirs(target_dir, exist_ok=True)
+
     template_data = open(input_file).read()
-    os.path.dirname(output_file)
-    print(input_file, output_file)
+    text = render_template(data, template_data)
+    with open(output_file, "w") as output:
+        output.write(text)
+    log.info("Compiled template [%s]" % output_file)
 
 def render_template(data, template):
     try:
@@ -109,4 +115,4 @@ def render_template(data, template):
         return text
     except:
         transwarp.template.present_template_error()
-        raise
+        sys.exit(1)
