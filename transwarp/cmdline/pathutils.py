@@ -1,4 +1,5 @@
 import os
+import datetime
 
 __all__ = [
     "path_normalize",
@@ -6,6 +7,7 @@ __all__ = [
     "path_has_ext",
     "path_remove_ext",
     "path_touch",
+    "path_mtime",
 ]
 
 def path_normalize(path):
@@ -25,3 +27,9 @@ def path_remove_ext(path, ext):
 
 def path_touch(path):
     os.utime(path, None)
+
+def path_mtime(target=None):
+    try:
+        return datetime.datetime.fromtimestamp(os.stat(target).st_mtime)
+    except IOError:
+        return None
