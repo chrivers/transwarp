@@ -1,7 +1,9 @@
 import os
 import sys
 import glob
+import tempfile
 import fileinput
+import subprocess
 import logging as log
 
 from datetime import datetime
@@ -46,13 +48,15 @@ def main(args=None):
     templates = find_template_files(args.inputdir)
 
     if args.force:
-        log.debug("force all templates (--force)")
+        log.debug("forcing all templates (--force)")
         missing, updated = templates, []
     else:
         missing, updated = check_freshness(args.inputdir, args.outputdir, templates)
 
     targets = set(missing) | set(updated)
-    if targets:
+    if not targets:
+        log.info("All templates up-to-date")
+    elif args.action == "update":
         log.info("Compiling %d of %d templates" % (len(targets), len(templates)))
         for target in targets:
             compile_template(
@@ -61,8 +65,18 @@ def main(args=None):
                 output_file_name(path_join(args.outputdir, target)),
                 args.linkdir,
             )
+    elif args.action in ("diff", "word-diff"):
+        log.info("Diffing %d of %d templates" % (len(targets), len(templates)))
+        for target in targets:
+            diff_template(
+                sections,
+                path_join(args.inputdir, target),
+                output_file_name(path_join(args.outputdir, target)),
+                args.linkdir,
+                word_diff_mode=(args.action == "word-diff")
+            )
     else:
-        log.info("All templates up-to-date")
+        raise NotImplementedError("Unknown action [%s]" % args.action)
 
 def get_timestamp(filename):
     return datetime.fromtimestamp(os.stat(filename).st_mtime)
@@ -81,7 +95,7 @@ def check_freshness(idir, odir, templates):
             continue
 
         if get_timestamp(ifile) > otime:
-            res.append(name)
+            updated.append(name)
             log.debug("  template %s: stale" % ofile)
         else:
             log.debug("  template %s: fresh" % ofile)
@@ -111,23 +125,43 @@ def find_stf_files(datadir):
     else:
         raise LookupError("Could not find any .stf files in %r" % datadir)
 
+def diff_template(data, input_file, output_file, link_paths, word_diff_mode):
+    text = render_template(data, input_file, output_file, link_paths)
+
+    if os.path.exists(output_file):
+        diff_target = output_file
+    else:
+        empty = tempfile.NamedTemporaryFile()
+        diff_target = empty.name
+
+    with tempfile.NamedTemporaryFile() as compiled:
+        compiled.write(text.encode())
+        compiled.flush()
+        args = ["colordiff", "-u", diff_target, compiled.name]
+        log.debug("  running diff: %s" % args)
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        diff_lines = proc.stdout.readlines()
+        if diff_lines:
+            log.info("  %s: %d lines" % (output_file, len(diff_lines)))
+        proc.wait()
+
 def compile_template(data, input_file, output_file, link_paths):
     target_dir = os.path.dirname(output_file)
     if target_dir:
         os.makedirs(target_dir, exist_ok=True)
 
-    template_data = open(input_file).read()
-    text = render_template(data, template_data, link_paths, output_file)
+    text = render_template(data, input_file, output_file, link_paths)
     with open(output_file, "w") as output:
         output.write(text)
     log.info("Compiled template [%s]" % output_file)
 
-def render_template(data, template, link_paths, name):
+def render_template(data, input_file, output_file, link_paths):
     try:
-        text = transwarp.template.generate(template, data, link_paths)
+        template_data = open(input_file).read()
+        text = transwarp.template.generate(template_data, data, link_paths)
         return text
     except ImportError as E:
-        log.error("Compiler plugin [%s] not found for [%s]. Add search path with -L<path>" % (E.name, name))
+        log.error("Compiler plugin [%s] not found for [%s]. Add search path with -L<path>" % (E.name, output_file))
         E.name
         sys.exit(2)
     except:

@@ -48,19 +48,28 @@ _output.add_argument(
 )
 
 _output.add_argument(
+    "-d", "--diff",
+    action="store_const",
+    const="diff",
+    dest="action",
+    default="diff",
+    help="Unified diff mode (default)",
+)
+
+_output.add_argument(
     "-w", "--word-diff",
     action="store_const",
     const="word-diff",
     dest="action",
-    help="Use word-diff mode",
+    help="Word-diff mode",
 )
 
 _output.add_argument(
     "-u", "--update",
-    action="store_true",
-    default=False,
-    dest="all",
-    help=""
+    action="store_const",
+    const="update",
+    dest="action",
+    help="Write changes to files"
 )
 
 _paths = parser.add_argument_group("Input and output paths")
@@ -121,4 +130,5 @@ def parse_and_validate():
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)
-        raise
+        log.error("error: %s" % E)
+        sys.exit(1)
