@@ -10,16 +10,11 @@ class ArgumentParser(argparse.ArgumentParser):
     def _get_formatter(self):
         return argparse.HelpFormatter(self.prog, max_help_position=42, width=100)
 
-parser = ArgumentParser(prog="transwarp")
+parser = ArgumentParser(prog="transwarp", add_help=False)
 
-parser.add_argument(
-    "-a", "--all",
-    action="store_true",
-    dest="all",
-    help="Compile all templates, instead of trying to detect changes"
-)
+_info = parser.add_argument_group("Information")
 
-parser.add_argument(
+_info.add_argument(
     "-v", "--verbose",
     action="append_const",
     const=-10,
@@ -28,7 +23,7 @@ parser.add_argument(
     help="Increase verbosity"
 )
 
-parser.add_argument(
+_info.add_argument(
     "-q", "--quiet",
     action="append_const",
     const=10,
@@ -36,14 +31,40 @@ parser.add_argument(
     help="Decrease verbosity"
 )
 
-parser.add_argument(
-    "-w", "--word-diff",
+_info.add_argument(
+    "-h", "--help",
+    action="help",
+    help="Show help"
+)
+
+_output = parser.add_argument_group("File output")
+
+_output.add_argument(
+    "-f", "--force",
     action="store_true",
-    dest="worddiff",
+    dest="force",
+    default=False,
+    help="Force recompilation of unchanged templates"
+)
+
+_output.add_argument(
+    "-w", "--word-diff",
+    action="store_const",
+    const="word-diff",
+    dest="action",
     help="Use word-diff mode",
 )
 
-parser.add_argument(
+_output.add_argument(
+    "-u", "--update",
+    action="store_true",
+    dest="all",
+    help=""
+)
+
+_paths = parser.add_argument_group("Input and output paths")
+
+_paths.add_argument(
     "-D", "--data-dir",
     action="store",
     dest="datadir",
@@ -51,7 +72,7 @@ parser.add_argument(
     metavar="<path>"
 )
 
-parser.add_argument(
+_paths.add_argument(
     "-L", "--ĺib-dir",
     action="append",
     dest="linkdir",
@@ -60,7 +81,7 @@ parser.add_argument(
     metavar="<path>"
 )
 
-parser.add_argument(
+_paths.add_argument(
     "-I", "--input-dir",
     action="store",
     dest="inputdir",
@@ -69,7 +90,7 @@ parser.add_argument(
     metavar="<path>"
 )
 
-parser.add_argument(
+_paths.add_argument(
     "-O", "--output-dir",
     action="store",
     dest="outputdir",
@@ -78,7 +99,7 @@ parser.add_argument(
     metavar="<path>"
 )
 
-parser.add_argument(
+_paths.add_argument(
     "-F", "--filter",
     action="store",
     dest="filter",

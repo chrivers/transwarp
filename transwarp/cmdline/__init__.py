@@ -34,8 +34,8 @@ def main(args=None):
     log.debug("parsed %d stf files" % (len(files)))
     templates = find_template_files(args.inputdir)
 
-    if args.all:
-        log.debug("using all templates (--all)")
+    if args.force:
+        log.debug("force all templates (--force)")
         missing, updated = templates, []
     else:
         missing, updated = check_freshness(args.inputdir, args.outputdir, templates)
