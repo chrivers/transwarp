@@ -28,6 +28,9 @@ def path_remove_ext(path, ext):
     else:
         return path
 
+def output_file_name(name):
+    return path_remove_ext(name, DEFAULT_TEMPLATE_EXTENSION)
+
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
@@ -55,7 +58,7 @@ def main(args=None):
             compile_template(
                 sections,
                 path_join(args.inputdir, target),
-                path_join(args.outputdir, target),
+                output_file_name(path_join(args.outputdir, target)),
                 args.linkdir,
             )
     else:
@@ -69,7 +72,7 @@ def check_freshness(idir, odir, templates):
     log.debug("scanning for templates to compile:")
     for name in templates:
         ifile = path_join(idir, name)
-        ofile = path_join(odir, name)
+        ofile = output_file_name(path_join(odir, name))
         try:
             otime = get_timestamp(ofile)
         except OSError:
