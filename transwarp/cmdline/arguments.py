@@ -1,8 +1,13 @@
-from argparse import ArgumentParser, HelpFormatter
+import argparse
 
-parser = ArgumentParser(formatter_class = lambda prog: HelpFormatter(prog, max_help_position=42, width=100))
+class ArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        raise ValueError(message)
 
-parser.prog = "transwarp"
+    def _get_formatter(self):
+        return argparse.HelpFormatter(self.prog, max_help_position=42, width=100)
+
+parser = ArgumentParser(prog="transwarp")
 
 parser.add_argument(
     "-a", "--all",
