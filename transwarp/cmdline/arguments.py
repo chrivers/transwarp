@@ -58,6 +58,7 @@ _output.add_argument(
 _output.add_argument(
     "-u", "--update",
     action="store_true",
+    default=False,
     dest="all",
     help=""
 )
