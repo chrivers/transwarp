@@ -1,7 +1,7 @@
 from transwarp.util.data import SearchableList
 from transwarp.parser.grammar import RE_ENUM_FIELD
 from transwarp.parser.strutil import text_width, hex_width
-from transwarp.parser.types import SectionObject
+from transwarp.types import SectionObject
 
 class Enum(SectionObject):
     def __init__(self, header, lines, comment):

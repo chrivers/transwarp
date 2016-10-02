@@ -1,10 +1,10 @@
 from transwarp.util.data import SearchableList
 from transwarp.parser.parser import parse_lines
-from transwarp.parser.types.enum import Enum, Flags
-from transwarp.parser.types.struct import Struct
-from transwarp.parser.types.parser import Parser
-from transwarp.parser.types.packet import Packet
-from transwarp.parser.types.object import Object
+from transwarp.types.enum import Enum, Flags
+from transwarp.types.struct import Struct
+from transwarp.types.parser import Parser
+from transwarp.types.packet import Packet
+from transwarp.types.object import Object
 
 def parse(lines):
     parsers = {

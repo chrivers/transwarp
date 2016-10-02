@@ -1,8 +1,8 @@
 from transwarp.util.data import SearchableList
 from transwarp.parser.grammar import *
 from transwarp.parser.parser import parse_lines
-from transwarp.parser.types.struct import Struct
-from transwarp.parser.types import SectionObject
+from transwarp.types.struct import Struct
+from transwarp.types import SectionObject
 
 class Packet(SectionObject):
     def __init__(self, header, lines, comment):

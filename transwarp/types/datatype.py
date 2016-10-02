@@ -1,5 +1,5 @@
 from transwarp.parser.grammar import RE_TYPE
-from transwarp.parser.types import SectionObject
+from transwarp.types import SectionObject
 
 class Type(SectionObject):
     def __init__(self, text):
