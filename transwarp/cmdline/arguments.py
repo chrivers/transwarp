@@ -1,8 +1,15 @@
 from argparse import ArgumentParser, HelpFormatter
 
-parser = ArgumentParser(formatter_class = lambda prog: HelpFormatter(prog, max_help_position=42, width=80))
+parser = ArgumentParser(formatter_class = lambda prog: HelpFormatter(prog, max_help_position=42, width=100))
 
 parser.prog = "transwarp"
+
+parser.add_argument(
+    "-a", "--all",
+    action="store_true",
+    dest="all",
+    help="Compile all templates, instead of trying to detect changes"
+)
 
 parser.add_argument(
     "-v", "--verbose",
@@ -53,15 +60,9 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "-W", "--write",
-    action="store_true",
+    "-F", "--filter",
+    action="store",
     dest="write",
-    help="Render all templates to the output directory",
-)
-
-parser.add_argument(
-    "-U", "--update",
-    action="store_true",
-    dest="write",
-    help="Update all templates, skipping unchanged ones",
+    help="Ignore all templates outside of target <path>",
+    metavar="<path>"
 )
