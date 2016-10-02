@@ -1,6 +1,10 @@
 import glob
 import datetime
+import fileinput
 import logging as log
+
+import transwarp.template
+
 from transwarp.cmdline.pathutils import *
 
 class Compiler(object):
@@ -35,4 +39,8 @@ class Compiler(object):
         self.data = transwarp.parser.parse(all_lines)
 
     def render(self, template):
-        return "<compiled>\n"
+        return transwarp.template.generate(
+            template,
+            self.data,
+            self.link_paths,
+        )
