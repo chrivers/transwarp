@@ -1,7 +1,6 @@
 import os
 import sys
 import glob
-import enum
 import datetime
 import tempfile
 import fileinput
@@ -12,6 +11,7 @@ import transwarp.parser
 import transwarp.template
 import transwarp.util.logformat
 import transwarp.cmdline.arguments
+from transwarp.cmdline.changes import Changes, Status
 from transwarp.cmdline.pathutils import *
 
 DEFAULT_TEMPLATE_EXTENSION = ".tpl"
@@ -25,34 +25,27 @@ def reverse_dict(data):
         res.setdefault(value, []).append(key)
     return res
 
-class Status(enum.Enum):
-    missing = 1
-    stale   = 2
-    fresh   = 3
-
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
 
-    files, newest_date = find_stf_files(args.datadir)
+    changes = Changes(args.outputdir, args.force, DEFAULT_TEMPLATE_EXTENSION)
+
+    files, newest_date = changes.find_stf_files(args.datadir)
 
     # parse all sections into a unified data structure, that the
     # templates can inspect
     all_lines = fileinput.input(files=files)
+    log.debug("parsed %d stf files" % (len(files)))
     sections = transwarp.parser.parse(all_lines)
 
-    log.debug("parsed %d stf files" % (len(files)))
-    templates = find_template_files(args.inputdir)
-    if not templates:
-        log.error("No templates found (searched for *.%s in '%s')" % (DEFAULT_TEMPLATE_EXTENSION, args.inputdir))
+    log.debug("Searching for templates in: %s" % args.inputdir)
+    if not changes.find_templates(args.inputdir):
+        log.error("No templates found (searched for %s in '%s')" % (DEFAULT_TEMPLATE_EXTENSION, args.inputdir))
         log.error("  hint: you can specify target dir with -I <path>")
         return False
 
-    if args.force:
-        log.debug("forcing all templates (--force)")
-        status = dict.fromkeys(templates, Status.stale)
-    else:
-        status = check_freshness(args.inputdir, args.outputdir, templates, newest_date)
+    changes.find_modifications()
 
     if not set(status.values()) - set([Status.fresh]):
         log.info("All templates up-to-date")
@@ -80,67 +73,18 @@ def main(args=None):
         if Status.missing in groups:
             log.info("Will create:")
             for target in sorted(groups[Status.missing]):
-                print("    %s" % target)
+                print("    %s" % output_file_name(target))
         if Status.stale in groups:
             log.info("Will update:")
             for target in sorted(groups[Status.stale]):
-                print("    %s" % target)
+                print("    %s" % output_file_name(target))
         if Status.fresh in groups:
             log.info("Up to date:")
             for target in sorted(groups[Status.fresh]):
-                print("    %s" % target)
+                print("    %s" % output_file_name(target))
     else:
         raise NotImplementedError("Unknown action [%s]" % args.action)
 
-def get_timestamp(filename):
-    return datetime.datetime.fromtimestamp(os.stat(filename).st_mtime)
-
-def check_freshness(idir, odir, templates, newest_date):
-    status = {}
-    log.debug("scanning for templates to compile:")
-    for name in templates:
-        ifile = path_join(idir, name)
-        ofile = output_file_name(path_join(odir, name))
-        try:
-            otime = get_timestamp(ofile)
-        except OSError:
-            log.debug("  template %s: not found" % ofile)
-            status[name] = Status.missing
-            continue
-
-        if max(get_timestamp(ifile), newest_date) > otime:
-            status[name] = Status.stale
-            log.debug("  template %s: stale" % ofile)
-        else:
-            status[name] = Status.fresh
-            log.debug("  template %s: fresh" % ofile)
-    return status
-
-def find_template_files(path, extension=DEFAULT_TEMPLATE_EXTENSION):
-    path = path_normalize(path)
-    log.debug("Searching for templates in: %s" % path)
-    i_files = []
-    for root, _, files in os.walk(path):
-        reldir = root[len(path):]
-        for name in files:
-            if path_has_ext(name, extension):
-                relpath = path_join(reldir, name)
-                log.debug("  template %s" % relpath)
-                i_files.append(relpath)
-    return i_files
-
-def find_stf_files(datadir):
-    # find all stf input files
-    files = glob.glob("%s/*.stf" % datadir)
-    if files:
-        newest = datetime.datetime.fromtimestamp(0)
-        log.debug("found stf files:")
-        for name in files:
-            log.debug("  %s" % name)
-            newest = max(newest, get_timestamp(name))
-        return files, newest
-    else:
-        raise LookupError("Could not find any .stf files in %r" % datadir)
 
 def diff_template(data, input_file, output_file, link_paths, word_diff_mode):
     text = render_template(data, input_file, output_file, link_paths)
