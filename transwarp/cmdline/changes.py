@@ -120,9 +120,24 @@ class Template(object):
             self._status = Status.fresh
 
     def diff(self, compiler, differ):
-        text = compiler.render(self)
+        code = open(self.input_file).read()
+        text = compiler.render(code)
 
         with tempfile.NamedTemporaryFile() as compiled:
             compiled.write(text.encode())
             compiled.flush()
-            differ.diff(self.output_file, compiled.name)
+            differ.diff(
+                self.output_file,
+                compiled.name,
+                labels=(
+                    "%s (existing)" % self.output_file,
+                    "%s (compiled)" % self.output_file)
+            )
+
+
+    def update(self, compiler, differ):
+        code = open(self.input_file).read()
+        text = compiler.render(code)
+
+        with open(self.output_file, "w") as output:
+            output.write(text)

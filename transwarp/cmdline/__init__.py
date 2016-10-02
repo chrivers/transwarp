@@ -22,7 +22,10 @@ def main(args=None):
     differ = Differ(["-u", "-N"])
     changes = Changes(args.outputdir, args.force, args.extension)
     compiler = Compiler()
+    for path in args.linkdir:
+        compiler.add_link_dir(path)
     compiler.load_stf(args.datadir)
+    compiler.compile()
 
     log.debug("input mtime [%s]" % compiler.most_recent_mtime)
     log.debug("Searching for templates in: %s" % args.inputdir)
@@ -39,12 +42,7 @@ def main(args=None):
     elif args.action == "update":
         log.info("Compiling %d of %d templates" % (len(changes), len(changes.templates)))
         for target in changes:
-            compile_template(
-                sections,
-                target.input_file,
-                target.output_file,
-                args.linkdir,
-            )
+            target.update(compiler, differ)
     elif args.action in ("diff", "word-diff"):
         log.info("Diffing %d of %d templates" % (len(changes), len(changes.templates)))
         for target in changes:
