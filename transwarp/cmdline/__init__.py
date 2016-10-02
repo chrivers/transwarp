@@ -60,6 +60,10 @@ def main(args=None):
 
     log.debug("parsed %d stf files" % (len(files)))
     templates = find_template_files(args.inputdir)
+    if not templates:
+        log.error("No templates found (searched for *.%s in '%s')" % (DEFAULT_TEMPLATE_EXTENSION, args.inputdir))
+        log.error("  hint: you can specify target dir with -I <path>")
+        return False
 
     if args.force:
         log.debug("forcing all templates (--force)")
@@ -194,7 +198,8 @@ def render_template(data, input_file, output_file, link_paths):
         text = transwarp.template.generate(template_data, data, link_paths)
         return text
     except ImportError as E:
-        log.error("Compiler plugin [%s] not found for [%s]. Add search path with -L<path>" % (E.name, output_file))
+        log.error("Compiler plugin [%s] not found for [%s]" % (E.name, output_file))
+        log.error("  hint: Add search path with -L<path>")
         E.name
         sys.exit(2)
     except:
