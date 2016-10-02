@@ -127,6 +127,15 @@ _paths.add_argument(
     metavar="<path>"
 )
 
+_paths.add_argument(
+    "-e", "--extension",
+    action="store",
+    dest="extension",
+    default="tpl",
+    help="Template extension. Other files will be ignored (default: .tpl)",
+    metavar="<name>"
+)
+
 def parse_and_validate():
     try:
         args = parser.parse_args()
@@ -140,6 +149,7 @@ def parse_and_validate():
         args.inputdir  = path_normalize(args.inputdir)
         args.outputdir = path_normalize(args.outputdir)
         args.linkdir   = [path_normalize(linkdir) for linkdir in args.linkdir]
+        args.extension = "." + args.extension.lstrip(".")
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)

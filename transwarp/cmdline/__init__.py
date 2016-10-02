@@ -14,13 +14,11 @@ import transwarp.cmdline.arguments
 from transwarp.cmdline.changes import Changes, Status
 from transwarp.cmdline.pathutils import *
 
-DEFAULT_TEMPLATE_EXTENSION = ".tpl"
-
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
 
-    changes = Changes(args.outputdir, args.force, DEFAULT_TEMPLATE_EXTENSION)
+    changes = Changes(args.outputdir, args.force, args.extension)
 
     files, newest_date = changes.find_stf_files(args.datadir)
 
@@ -32,7 +30,7 @@ def main(args=None):
 
     log.debug("Searching for templates in: %s" % args.inputdir)
     if not changes.find_templates(args.inputdir, newest_date):
-        log.error("No templates found (searched for %s in '%s')" % (DEFAULT_TEMPLATE_EXTENSION, args.inputdir))
+        log.error("No templates found (searched for %s in '%s')" % (args.extension, args.inputdir))
         log.error("  hint: you can specify target dir with -I <path>")
         return False
 
