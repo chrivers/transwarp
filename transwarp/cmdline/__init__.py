@@ -10,12 +10,17 @@ import transwarp.cmdline.arguments
 
 def main(args=None):
     argparser = transwarp.cmdline.arguments.parser
-    args = argparser.parse_args()
-    transwarp.util.logformat.initialize(sum(args.verbosity) + 20)
+    transwarp.util.logformat.initialize()
+    try:
+        args = argparser.parse_args()
+    except ValueError as E:
+        print(argparser.format_help(), file=sys.stderr)
+        transwarp.util.logformat.initialize(20)
+        log.error("Argument error: [%s]" % E)
+        return 1
 
-    if len(sys.argv) == 1:
-        argparser.print_help()
-        return 0
+    transwarp.util.logformat.set_level(sum(args.verbosity) + log.INFO)
+    return 0
     try:
         template_file = sys.argv[1]
         template_data = open(template_file).read()
