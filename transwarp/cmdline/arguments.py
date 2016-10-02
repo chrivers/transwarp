@@ -3,6 +3,7 @@ import logging as log
 import argparse
 import transwarp.util.logformat
 from transwarp.cmdline.pathutils import path_normalize
+import transwarp
 
 class ArgumentParser(argparse.ArgumentParser):
     def error(self, message):
@@ -11,7 +12,7 @@ class ArgumentParser(argparse.ArgumentParser):
     def _get_formatter(self):
         return argparse.HelpFormatter(self.prog, max_help_position=42, width=100)
 
-parser = ArgumentParser(prog="transwarp", add_help=False)
+parser = ArgumentParser(prog="transwarp-%s" % transwarp.__version__, add_help=False)
 
 _info = parser.add_argument_group("Information")
 
