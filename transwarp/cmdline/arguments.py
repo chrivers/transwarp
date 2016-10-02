@@ -2,6 +2,7 @@ import sys
 import logging as log
 import argparse
 import transwarp.util.logformat
+from transwarp.cmdline.pathutils import path_normalize
 
 class ArgumentParser(argparse.ArgumentParser):
     def error(self, message):
@@ -136,6 +137,9 @@ def parse_and_validate():
             raise ValueError("datadir (-D) is required")
         if args.filter:
             raise NotImplementedError("filter (-F) not yet supported")
+        args.inputdir  = path_normalize(args.inputdir)
+        args.outputdir = path_normalize(args.outputdir)
+        args.linkdir   = [path_normalize(linkdir) for linkdir in args.linkdir]
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)
