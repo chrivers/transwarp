@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 from setuptools import setup
+import versioneer
 
 DESCRIPTION = \
 """The transwarp compiler parses Simple Type Format (.stf) input file,
@@ -10,9 +11,10 @@ everything else, from one common source"""
 
 setup(
     name = "transwarp",
-    version = "0.1.0",
     author = "Christian Iversen",
     author_email = "ci@iversenit.dk",
+    version = versioneer.get_version(),
+    cmdclass = versioneer.get_cmdclass(),
     packages = [
         "transwarp",
         "transwarp.cmdline",

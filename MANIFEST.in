@@ -1,0 +1,2 @@
+include versioneer.py
+include transwarp/_version.py
