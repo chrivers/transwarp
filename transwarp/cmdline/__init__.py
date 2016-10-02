@@ -62,27 +62,3 @@ def main(args=None):
                 print("    %s" % target.output_file)
     else:
         raise NotImplementedError("Unknown action [%s]" % args.action)
-
-def compile_template(data, input_file, output_file, link_paths):
-    target_dir = os.path.dirname(output_file)
-    if target_dir:
-        os.makedirs(target_dir, exist_ok=True)
-
-    text = render_template(data, input_file, output_file, link_paths)
-    with open(output_file, "w") as output:
-        output.write(text)
-    log.info("Compiled template [%s]" % output_file)
-
-def render_template(data, input_file, output_file, link_paths):
-    try:
-        template_data = open(input_file).read()
-        text = transwarp.template.generate(template_data, data, link_paths)
-        return text
-    except ImportError as E:
-        log.error("Compiler plugin [%s] not found for [%s]" % (E.name, output_file))
-        log.error("  hint: Add search path with -L<path>")
-        E.name
-        sys.exit(2)
-    except:
-        transwarp.template.present_template_error()
-        sys.exit(1)

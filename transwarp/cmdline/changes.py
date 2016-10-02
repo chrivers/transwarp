@@ -119,9 +119,21 @@ class Template(object):
         else:
             self._status = Status.fresh
 
+    def render(self, compiler):
+        try:
+            code = open(self.input_file).read()
+            return compiler.render(code)
+        except ImportError as E:
+            log.error("Compiler plugin [%s] not found for [%s]" % (E.name, self.output_file))
+            log.error("  hint: Add search path with -L<path>")
+            E.name
+            sys.exit(2)
+        except:
+            transwarp.template.present_template_error()
+            sys.exit(1)
+
     def diff(self, compiler, differ):
-        code = open(self.input_file).read()
-        text = compiler.render(code)
+        text = self.render(compiler)
 
         with tempfile.NamedTemporaryFile() as compiled:
             compiled.write(text.encode())
@@ -134,10 +146,12 @@ class Template(object):
                     "%s (compiled)" % self.output_file)
             )
 
-
     def update(self, compiler, differ):
         code = open(self.input_file).read()
         text = compiler.render(code)
 
+        target_dir = os.path.dirname(self.output_file)
+        if target_dir:
+            os.makedirs(target_dir, exist_ok=True)
         with open(self.output_file, "w") as output:
             output.write(text)
