@@ -15,6 +15,7 @@ setup(
     author_email = "ci@iversenit.dk",
     packages = [
         "transwarp",
+        "transwarp.cmdline",
         "transwarp.types",
         "transwarp.parser",
         "transwarp.template",
@@ -22,7 +23,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'transwarp = transwarp.__main__:main'
+            'transwarp = transwarp.cmdline:main'
         ]
     },
     description = DESCRIPTION,
