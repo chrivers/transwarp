@@ -1,4 +1,7 @@
+import sys
+import logging as log
 import argparse
+import transwarp.util.logformat
 
 class ArgumentParser(argparse.ArgumentParser):
     def error(self, message):
@@ -71,3 +74,21 @@ parser.add_argument(
     help="Ignore all templates outside of target <path>",
     metavar="<path>"
 )
+
+def parse_and_validate():
+    try:
+        args = parser.parse_args()
+        transwarp.util.logformat.set_level(sum(args.verbosity) + log.INFO)
+        log.debug("parsed arguments: %r" % args)
+
+        if not args.datadir:
+            raise ValueError("datadir (-D) is required")
+        if args.inputdir and not args.outputdir:
+            raise ValueError("output dir (-O) is required with input dir (-I)")
+        if args.outputdir and not args.inputdir:
+            raise ValueError("input dir (-I) is required with output dir (-O)")
+        return args
+    except ValueError as E:
+        print(parser.format_help(), file=sys.stderr)
+        log.error("Argument error: %s" % E)
+        raise
