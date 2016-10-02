@@ -2,7 +2,7 @@ import sys
 from contextlib import contextmanager
 
 from mako import exceptions
-from mako.template import Template
+from mako.template import Template as MakoTemplate
 from mako.exceptions import RichTraceback
 
 import transwarp.parser
@@ -28,17 +28,8 @@ def scoped_search_paths(paths):
         if p in sys.path:
             sys.path.remove
 
-def find_available():
-    import os
-    import fnmatch
-    matches = []
-    for root, dirnames, filenames in os.walk('.'):
-        for filename in fnmatch.filter(filenames, '*.tpl'):
-            matches.append(os.path.join(os.path.normpath(root), filename))
-    return matches
-
 def generate(tmpl, sections, link_paths):
-    template = Template(tmpl)
+    template = MakoTemplate(tmpl)
     empty = SearchableList()
     context = {
         "enums": sections.get("enum", empty),
