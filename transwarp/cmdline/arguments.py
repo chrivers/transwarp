@@ -52,6 +52,15 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-L", "--ĺib-dir",
+    action="append",
+    dest="linkdir",
+    help="Search path for compiler plugins",
+    default=[],
+    metavar="<path>"
+)
+
+parser.add_argument(
     "-I", "--input-dir",
     action="store",
     dest="inputdir",
@@ -72,7 +81,7 @@ parser.add_argument(
 parser.add_argument(
     "-F", "--filter",
     action="store",
-    dest="write",
+    dest="filter",
     help="Ignore all templates outside of target <path>",
     metavar="<path>"
 )
@@ -85,10 +94,8 @@ def parse_and_validate():
 
         if not args.datadir:
             raise ValueError("datadir (-D) is required")
-        # if args.inputdir and args.outputdir:
-        #     raise ValueError("output dir (-O) is required with input dir (-I)")
-        # if args.outputdir and args.inputdir:
-        #     raise ValueError("input dir (-I) is required with output dir (-O)")
+        if args.filter:
+            raise NotImplementedError("filter (-F) not yet supported")
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)

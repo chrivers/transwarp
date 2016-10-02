@@ -48,6 +48,7 @@ def main(args=None):
                 sections,
                 path_join(args.inputdir, target),
                 path_join(args.outputdir, target),
+                args.linkdir,
             )
     else:
         log.info("All templates up-to-date")
@@ -99,20 +100,24 @@ def find_stf_files(datadir):
     else:
         raise LookupError("Could not find any .stf files in %r" % datadir)
 
-def compile_template(data, input_file, output_file):
+def compile_template(data, input_file, output_file, link_paths):
     target_dir = os.path.dirname(output_file)
     os.makedirs(target_dir, exist_ok=True)
 
     template_data = open(input_file).read()
-    text = render_template(data, template_data)
+    text = render_template(data, template_data, link_paths, output_file)
     with open(output_file, "w") as output:
         output.write(text)
     log.info("Compiled template [%s]" % output_file)
 
-def render_template(data, template):
+def render_template(data, template, link_paths, name):
     try:
-        text = transwarp.template.generate(template, data)
+        text = transwarp.template.generate(template, data, link_paths)
         return text
+    except ImportError as E:
+        log.error("Compiler plugin [%s] not found for [%s]. Add search path with -L<path>" % (E.name, name))
+        E.name
+        sys.exit(2)
     except:
         transwarp.template.present_template_error()
         sys.exit(1)

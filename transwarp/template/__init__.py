@@ -1,22 +1,32 @@
 import sys
+from contextlib import contextmanager
 
 from mako import exceptions
 from mako.template import Template
 from mako.exceptions import RichTraceback
 
 import transwarp.parser
-from transwarp.util.data import SearchableList
 import transwarp.template
 import transwarp.template.util
+from transwarp.util.data import SearchableList
 
 context = None
 
-def _set_context(ctx):
+@contextmanager
+def mako_context(ctx):
     global context
     context = ctx
+    yield
+    context = None
 
-def _get_context():
-    return context
+@contextmanager
+def scoped_search_paths(paths):
+    for p in paths:
+        sys.path.insert(0, p)
+    yield
+    for p in paths:
+        if p in sys.path:
+            sys.path.remove
 
 def find_available():
     import os
@@ -27,7 +37,7 @@ def find_available():
             matches.append(os.path.join(os.path.normpath(root), filename))
     return matches
 
-def generate(tmpl, sections):
+def generate(tmpl, sections, link_paths):
     template = Template(tmpl)
     empty = SearchableList()
     context = {
@@ -40,9 +50,9 @@ def generate(tmpl, sections):
 
         "util": transwarp.template.util,
     }
-    _set_context(context)
-    result = template.render(**context).rstrip("\n")
-    _set_context(None)
+    with mako_context(context):
+        with scoped_search_paths(link_paths):
+            result = template.render(**context).rstrip("\n")
     return result
 
 def present_template_error():
