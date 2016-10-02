@@ -90,5 +90,4 @@ def parse_and_validate():
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)
-        log.error("Argument error: %s" % E)
         raise
