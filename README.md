@@ -7,7 +7,27 @@ you like! Your documentation will never be outdated again!
 The input data format is simple, and very easily extensible. It only
 enforces the most basic structure - you decide the rest!
 
-## Getting started ##
+## Overview ##
+
+```
++--------------------------+                                +---------------------+
+|                          |  Templates can load plugins    |                     |
+|  Template files (*.tpl)  <--------------------------------+  Compiler plugins   |
+|                          |                                |                     |
++-+------------------------+                                +---------------------+
+  |
+  | Compiler loads templates  +----------------------+
+  +--------------------------->                      |  Compiler writes output
+                              |  Transwarp Compiler  +-------------------------+
+  +--------------------------->                      |                         |
+  | Compiler loads stf files  +----------------------+                         |
+  |                                                                            |
++-+------------------------+                                +------------------v--+
+|                          |                                |                     |
+|    Source files (*.stf)  |                                |  Generated content  |
+|                          |                                |                     |
++--------------------------+                                +---------------------+
+```
 
 To use transwarp, you need a protocol description, and a corresponding
 template (or set of templates). The transwarp compiler parses all
@@ -23,9 +43,9 @@ logic into them!
 
 ## Input data format ##
 
-The input data format, boringly named Standard Type Framework (.stf),
-is a simple text-based format, designed to be easily human-readable
-while still being parsable.
+The input data format, boringly named Simple Type Framework (.stf), is
+a user-friendly text-based format, designed to be easily
+human-readable while still being parsable.
 
 There are a few different types of sections, that can be used to
 describe different structures of data.
@@ -47,4 +67,3 @@ enum ShipSystem
     ForeShields          = 0x06
     AftShields           = 0x07
 ```
-
