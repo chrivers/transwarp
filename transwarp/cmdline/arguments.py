@@ -56,6 +56,7 @@ parser.add_argument(
     action="store",
     dest="inputdir",
     help="Input directory for template files",
+    default=".",
     metavar="<path>"
 )
 
@@ -64,6 +65,7 @@ parser.add_argument(
     action="store",
     dest="outputdir",
     help="Output directory for compiled templates",
+    default=".",
     metavar="<path>"
 )
 
@@ -83,10 +85,6 @@ def parse_and_validate():
 
         if not args.datadir:
             raise ValueError("datadir (-D) is required")
-        if args.inputdir and not args.outputdir:
-            raise ValueError("output dir (-O) is required with input dir (-I)")
-        if args.outputdir and not args.inputdir:
-            raise ValueError("input dir (-I) is required with output dir (-O)")
         return args
     except ValueError as E:
         print(parser.format_help(), file=sys.stderr)
