@@ -2,6 +2,7 @@ import os
 import enum
 import glob
 import datetime
+import tempfile
 import logging as log
 
 from transwarp.cmdline.pathutils import *
@@ -18,19 +19,6 @@ class Changes(object):
         self.force_all = force_all
         self.output_dir = output_dir
         self.templates = {}
-
-    @staticmethod
-    def find_stf_files(datadir):
-        files = glob.glob("%s/*.stf" % datadir)
-        if files:
-            newest = datetime.datetime.fromtimestamp(0)
-            log.debug("found stf files:")
-            for name in files:
-                log.debug("  %s" % name)
-                newest = max(newest, path_mtime(name))
-            return files, newest
-        else:
-            raise LookupError("Could not find any .stf files in %r" % datadir)
 
     def __bool__(self):
         for item in self.templates.values():
@@ -71,7 +59,8 @@ class Changes(object):
     def find_modifications(self):
         if self.force_all:
             log.debug("forcing all templates (--force)")
-            status = dict.fromkeys(templates, Status.stale)
+            for template in self.templates.values():
+                template.expire()
         else:
             log.debug("scanning for templates to compile:")
             for name, template in sorted(self.templates.items()):
@@ -117,6 +106,9 @@ class Template(object):
     def status(self):
         return self._status
 
+    def expire(self):
+        self._status = Status.stale
+
     def refresh_status(self):
         otime = self.output_mtime
         itime = self.input_mtime
@@ -126,3 +118,11 @@ class Template(object):
             self._status = Status.stale
         else:
             self._status = Status.fresh
+
+    def diff(self, compiler, differ):
+        text = compiler.render(self)
+
+        with tempfile.NamedTemporaryFile() as compiled:
+            compiled.write(text.encode())
+            compiled.flush()
+            differ.diff(self.output_file, compiled.name)

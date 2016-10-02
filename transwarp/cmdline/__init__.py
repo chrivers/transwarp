@@ -2,7 +2,6 @@ import os
 import sys
 import glob
 import datetime
-import tempfile
 import fileinput
 import subprocess
 import logging as log
@@ -11,25 +10,23 @@ import transwarp.parser
 import transwarp.template
 import transwarp.util.logformat
 import transwarp.cmdline.arguments
+from transwarp.cmdline.differ import Differ
 from transwarp.cmdline.changes import Changes, Status
+from transwarp.cmdline.compiler import Compiler
 from transwarp.cmdline.pathutils import *
 
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
 
+    differ = Differ(["-u", "-N"])
     changes = Changes(args.outputdir, args.force, args.extension)
+    compiler = Compiler()
+    compiler.load_stf(args.datadir)
 
-    files, newest_date = changes.find_stf_files(args.datadir)
-
-    # parse all sections into a unified data structure, that the
-    # templates can inspect
-    all_lines = fileinput.input(files=files)
-    log.debug("parsed %d stf files" % (len(files)))
-    sections = transwarp.parser.parse(all_lines)
-
+    log.debug("input mtime [%s]" % compiler.most_recent_mtime)
     log.debug("Searching for templates in: %s" % args.inputdir)
-    if not changes.find_templates(args.inputdir, newest_date):
+    if not changes.find_templates(args.inputdir, compiler.most_recent_mtime):
         log.error("No templates found (searched for %s in '%s')" % (args.extension, args.inputdir))
         log.error("  hint: you can specify target dir with -I <path>")
         return False
@@ -51,13 +48,7 @@ def main(args=None):
     elif args.action in ("diff", "word-diff"):
         log.info("Diffing %d of %d templates" % (len(changes), len(changes.templates)))
         for target in changes:
-            diff_template(
-                sections,
-                target.input_file,
-                target.output_file,
-                args.linkdir,
-                word_diff_mode=(args.action == "word-diff")
-            )
+            target.diff(compiler, differ)
     elif args.action in ("summary"):
         if Status.missing in groups:
             log.info("Will create:")
@@ -73,30 +64,6 @@ def main(args=None):
                 print("    %s" % target.output_file)
     else:
         raise NotImplementedError("Unknown action [%s]" % args.action)
-
-
-def diff_template(data, input_file, output_file, link_paths, word_diff_mode):
-    text = render_template(data, input_file, output_file, link_paths)
-
-    if os.path.exists(output_file):
-        diff_target = output_file
-    else:
-        empty = tempfile.NamedTemporaryFile()
-        diff_target = empty.name
-
-    with tempfile.NamedTemporaryFile() as compiled:
-        compiled.write(text.encode())
-        compiled.flush()
-        args = ["colordiff", "-u", diff_target, compiled.name]
-        log.debug("  running diff: %s" % args)
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-        diff_lines = proc.stdout.readlines()
-        if diff_lines:
-            log.info("  %s: %d lines" % (output_file, len(diff_lines)))
-        else:
-            log.info("  %-32s unchanged (updating timestamp)" % (output_file))
-            path_touch(output_file)
-        proc.wait()
 
 def compile_template(data, input_file, output_file, link_paths):
     target_dir = os.path.dirname(output_file)
