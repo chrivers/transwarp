@@ -15,6 +15,7 @@ setup(
     author_email = "ci@iversenit.dk",
     version = versioneer.get_version(),
     cmdclass = versioneer.get_cmdclass(),
+    zip_safe = True,
     packages = [
         "transwarp",
         "transwarp.cmdline",
