@@ -40,8 +40,8 @@ def main(args=None):
     if not changes:
         log.info("All templates up-to-date")
     elif args.action == "update":
-        log.info("Compiling %d of %d templates" % (len(changes), len(changes.templates)))
         for target in changes:
+            log.info("Updated %s" % target.output_file)
             target.update(compiler, differ)
     elif args.action in ("diff", "word-diff"):
         log.info("Diffing %d of %d templates" % (len(changes), len(changes.templates)))
