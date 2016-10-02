@@ -2,12 +2,11 @@ import os
 import sys
 import glob
 import enum
+import datetime
 import tempfile
 import fileinput
 import subprocess
 import logging as log
-
-from datetime import datetime
 
 import transwarp.parser
 import transwarp.template
@@ -49,7 +48,7 @@ def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
 
-    files = find_stf_files(args.datadir)
+    files, newest_date = find_stf_files(args.datadir)
 
     # parse all sections into a unified data structure, that the
     # templates can inspect
@@ -63,7 +62,7 @@ def main(args=None):
         log.debug("forcing all templates (--force)")
         status = dict.fromkeys(templates, Status.stale)
     else:
-        status = check_freshness(args.inputdir, args.outputdir, templates)
+        status = check_freshness(args.inputdir, args.outputdir, templates, newest_date)
 
     if not set(status.values()) - set([Status.fresh]):
         log.info("All templates up-to-date")
@@ -104,9 +103,9 @@ def main(args=None):
         raise NotImplementedError("Unknown action [%s]" % args.action)
 
 def get_timestamp(filename):
-    return datetime.fromtimestamp(os.stat(filename).st_mtime)
+    return datetime.datetime.fromtimestamp(os.stat(filename).st_mtime)
 
-def check_freshness(idir, odir, templates):
+def check_freshness(idir, odir, templates, newest_date):
     status = {}
     log.debug("scanning for templates to compile:")
     for name in templates:
@@ -119,7 +118,7 @@ def check_freshness(idir, odir, templates):
             status[name] = Status.missing
             continue
 
-        if get_timestamp(ifile) > otime:
+        if max(get_timestamp(ifile), newest_date) > otime:
             status[name] = Status.stale
             log.debug("  template %s: stale" % ofile)
         else:
@@ -144,10 +143,12 @@ def find_stf_files(datadir):
     # find all stf input files
     files = glob.glob("%s/*.stf" % datadir)
     if files:
+        newest = datetime.datetime.fromtimestamp(0)
         log.debug("found stf files:")
         for name in files:
             log.debug("  %s" % name)
-        return files
+            newest = max(newest, get_timestamp(name))
+        return files, newest
     else:
         raise LookupError("Could not find any .stf files in %r" % datadir)
 
