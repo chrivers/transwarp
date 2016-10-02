@@ -30,6 +30,9 @@ def path_remove_ext(path, ext):
     else:
         return path
 
+def path_touch(path):
+    os.utime(path, None)
+
 def output_file_name(name):
     return path_remove_ext(name, DEFAULT_TEMPLATE_EXTENSION)
 
@@ -170,6 +173,9 @@ def diff_template(data, input_file, output_file, link_paths, word_diff_mode):
         diff_lines = proc.stdout.readlines()
         if diff_lines:
             log.info("  %s: %d lines" % (output_file, len(diff_lines)))
+        else:
+            log.info("  %-32s unchanged (updating timestamp)" % (output_file))
+            path_touch(output_file)
         proc.wait()
 
 def compile_template(data, input_file, output_file, link_paths):
