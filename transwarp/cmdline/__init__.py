@@ -1,7 +1,6 @@
 import os
 import sys
 import glob
-import fnmatch
 import fileinput
 import logging as log
 
@@ -12,13 +11,22 @@ import transwarp.template
 import transwarp.util.logformat
 import transwarp.cmdline.arguments
 
-DEFAULT_TEMPLATE_EXTENSION = "*.tpl"
+DEFAULT_TEMPLATE_EXTENSION = ".tpl"
 
 def path_normalize(path):
     return os.path.normpath(path) + os.path.sep
 
 def path_join(a, b):
     return os.path.normpath(os.path.join(a, b))
+
+def path_has_ext(path, ext):
+    return os.path.splitext(path)[1] == ext
+
+def path_remove_ext(path, ext):
+    if path_has_ext(path, ext):
+        return path[:-len(ext)]
+    else:
+        return path
 
 def main(args=None):
     transwarp.util.logformat.initialize()
@@ -76,14 +84,14 @@ def check_freshness(idir, odir, templates):
             log.debug("  template %s: fresh" % ofile)
     return missing, updated
 
-def find_template_files(path, extension_glob=DEFAULT_TEMPLATE_EXTENSION):
+def find_template_files(path, extension=DEFAULT_TEMPLATE_EXTENSION):
     path = path_normalize(path)
     log.debug("Searching for templates in: %s" % path)
     i_files = []
     for root, _, files in os.walk(path):
         reldir = root[len(path):]
         for name in files:
-            if fnmatch.fnmatch(name, extension_glob):
+            if path_has_ext(name, extension):
                 relpath = path_join(reldir, name)
                 log.debug("  template %s" % relpath)
                 i_files.append(relpath)
@@ -102,7 +110,8 @@ def find_stf_files(datadir):
 
 def compile_template(data, input_file, output_file, link_paths):
     target_dir = os.path.dirname(output_file)
-    os.makedirs(target_dir, exist_ok=True)
+    if target_dir:
+        os.makedirs(target_dir, exist_ok=True)
 
     template_data = open(input_file).read()
     text = render_template(data, template_data, link_paths, output_file)
