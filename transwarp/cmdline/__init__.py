@@ -37,7 +37,7 @@ def main(args=None):
     changes.find_modifications()
 
     groups = changes.grouped()
-    if not changes:
+    if not changes and args.action != "summary":
         log.info("All templates up-to-date")
     elif args.action == "update":
         for target in changes:
@@ -47,7 +47,7 @@ def main(args=None):
         log.info("Diffing %d of %d templates" % (len(changes), len(changes.templates)))
         for target in changes:
             target.diff(compiler, differ)
-    elif args.action in ("summary"):
+    elif args.action == "summary":
         if Status.missing in groups:
             log.info("Will create:")
             for target in sorted(groups[Status.missing]):
