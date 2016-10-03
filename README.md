@@ -52,15 +52,69 @@ Okay, so you want to try out transwarp! Here's what you need:
 
 ```bash
 # download and install transwarp
-$ git clone https:/a/github.com/chrivers/transwarp
+$ git clone https://github.com/chrivers/transwarp
 $ cd transwarp
-$ ./setup.py install # use sudo if you want to install system-wide
+$ ./setup.py -q install # use sudo if you want to install system-wide
+$ cd ..
 
 # as an example, get artemis protocol spec
-$ git clone https://github.com/chrivers/isolinear-chips protocol
+$ git clone https://github.com/chrivers/isolinear-chips
 
 # as an example, get rust code templates
-$ git clone https://github.com/chrivers/duranium-templates templates
+$ git clone https://github.com/chrivers/duranium-templates
+
+# to see the complete set of options:
+$ transwarp --help
+```
+
+If you get a list of commend line arguments, transwarp is installed
+correctly. Otherwise, please open an issue so we can fix the problem.
+
+Now we are ready to compile!
+```bash
+# let's see a summary of what transwarp would like to compile
+$ transwarp -D isolinear-chips/protocol -I duranium-templates/templates -O output-dir -s
+[*] Will create:
+    output-dir/client/mod.rs
+    output-dir/client/reader.rs
+    output-dir/client/writer.rs
+    output-dir/enums.rs
+    output-dir/maps.rs
+    output-dir/server/mod.rs
+    output-dir/server/object.rs
+    output-dir/server/reader.rs
+    output-dir/server/update.rs
+    output-dir/server/writer.rs
+    output-dir/structs.rs
+```
+
+Let's do a quick breakdown of the arguments here:
+
+```capnp
+# -D isolinear-chips/protocol
+
+This points transwarp to the protocol specification. From this
+directory, all `*.stf` files are loaded. Order and filenames do not
+matter, except for maintenance reasons. Only the file content matters.
+
+# -I duranium-templates/templates
+
+Here we point transwarp to the input-dir. This directory is
+*recursively* scanned for templates, to be generated. The default
+template file extension is `.tpl`, but this can be changed with the
+--extension (-e) option.
+
+# -O output-dir
+
+Here we set the output directory. The relative path of the input file
+from the input-dir is used as the output file name.
+
+# -s (summarize)
+
+Transwarp defaults to showing a diff (like "git diff"), but since the
+files have not been initially generated yet, this would produce a very
+large amount of output. To avoid this, we use "-s" to produce only a
+list of changes.
 ```
 
 ## STF specifications ##
