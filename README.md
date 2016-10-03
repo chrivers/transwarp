@@ -131,6 +131,66 @@ files have not been initially generated yet, this would produce a very
 large amount of output. To avoid this, we use `-s` to produce only a
 list of changes.
 
+
+If we agree with the summary, we can write all the files by appending
+`-u` (update mode):
+
+```
+$ transwarp -D isolinear/protocol -I duranium/templates -L duranium/lib -O output-dir -u
+[*] Updated output-dir/server/mod.rs
+[*] Updated output-dir/structs.rs
+[*] Updated output-dir/server/object.rs
+[*] Updated output-dir/server/writer.rs
+[*] Updated output-dir/client/writer.rs
+[*] Updated output-dir/client/reader.rs
+[*] Updated output-dir/maps.rs
+[*] Updated output-dir/enums.rs
+[*] Updated output-dir/server/reader.rs
+[*] Updated output-dir/server/update.rs
+[*] Updated output-dir/client/mod.rs
+```
+
+Transwarp looks at the modification time of both stf files and
+template files, and tries to only update changed files, so if we run
+it again, we can see we are synchronized:
+
+```
+$ transwarp -D isolinear/protocol -I duranium/templates -L duranium/lib -O output-dir -u
+[*] All templates up-to-date
+```
+
+## Command examples ##
+
+Render templates from "foo" into "bar":
+
+```
+$ transwarp -I foo -O bar -u
+```
+
+Summarize changes caused by rendering templates from "src" into current dir:
+
+```
+$ transwarp -D someproto -I src -s
+```
+
+Show diff caused by rendering templates from current dir (recursively) into "target":
+
+```
+$ transwarp -D myspec -O target
+```
+
+Enable verbose mode to explain what is going on behind the scenes:
+
+```
+$ transwarp -v -D data -I from -O to
+```
+
+Enable quiet mode to compile from build scripts without unnecessary output:
+
+```
+$ transwarp -q -D specfiles -I ../templates -O src/protocol-parser/
+```
+
 ## STF specifications ##
 
 The input data format, boringly named Simple Type Framework (.stf), is
