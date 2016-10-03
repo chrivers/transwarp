@@ -45,9 +45,9 @@ class Changes(object):
         return path_remove_ext(name, self.extension)
 
     def find_templates(self, path, minimum_mtime):
+        templates = {}
         for root, _, files in os.walk(path):
             reldir = root[len(path):]
-            templates = {}
             for name in files:
                 if path_has_ext(name, self.extension):
                     relpath = path_join(reldir, name)
