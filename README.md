@@ -326,3 +326,14 @@ t.b.d.
 ### Types ###
 
 t.b.d.
+
+## Licence ##
+
+This project is licences under the GNU [General Public
+Licence](https://www.gnu.org/licenses/gpl-3.0.txt) (GPL) Version 3.
+
+## Etymology ##
+
+In the Star Trek universe, *Transwarp* refers to speeds faster than
+Warp 10. This is the theoretical warp speed limit, much the like the
+speed of light is limit in our universe.
