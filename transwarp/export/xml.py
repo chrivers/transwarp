@@ -1,6 +1,5 @@
 import io
 import sys
-#import lxml.etree.ElementTree as ET
 import lxml.etree as ET
 
 def dump(elem):
@@ -9,6 +8,8 @@ def dump(elem):
 def export(data):
     out = io.StringIO()
     root = ET.Element("root")
+    warning = "---- NON-FINALIZED FORMAT. EXPECT THIS FORMAT TO CHANGE WITHOUT WARNING ----"
+    root.append(ET.Comment(warning))
     for typename, values in data.items():
         for value in values:
             typetag = ET.Element(typename)
@@ -26,4 +27,5 @@ def export(data):
                 if hasattr(field, "value"):
                     fieldtag.attrib["value"] = field.value
                 typetag.append(fieldtag)
+    root.append(ET.Comment(warning))
     dump(root)
