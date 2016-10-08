@@ -83,6 +83,14 @@ _output.add_argument(
     help="Write changes to files"
 )
 
+_output.add_argument(
+    "-x", "--export",
+    action="store",
+    dest="export_mode",
+    metavar="<mode>",
+    help="Export data structure (supported modes: xml)"
+)
+
 _paths = parser.add_argument_group("Input and output paths")
 
 _paths.add_argument(
@@ -147,6 +155,8 @@ def parse_and_validate():
             raise ValueError("datadir (-D) is required")
         if args.filter:
             raise NotImplementedError("filter (-F) not yet supported")
+        if args.export_mode:
+            args.action = "export"
         args.inputdir  = path_normalize(args.inputdir)
         args.outputdir = path_normalize(args.outputdir)
         args.linkdir   = [path_normalize(linkdir) for linkdir in args.linkdir]

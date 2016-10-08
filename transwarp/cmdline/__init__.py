@@ -10,6 +10,7 @@ import transwarp.parser
 import transwarp.template
 import transwarp.util.logformat
 import transwarp.cmdline.arguments
+import transwarp.export.xml
 from transwarp.cmdline.differ import Differ
 from transwarp.cmdline.changes import Changes, Status
 from transwarp.cmdline.compiler import Compiler
@@ -26,6 +27,13 @@ def main(args=None):
         compiler.add_link_dir(path)
     compiler.load_stf(args.datadir)
     compiler.compile()
+
+    if args.action == "export":
+        if args.export_mode == "xml":
+            transwarp.export.xml.export(compiler.data)
+            return True
+        else:
+            raise NotImplementedError("Unknown export mode [%s]" % args.export_mode)
 
     log.debug("input mtime [%s]" % compiler.most_recent_mtime)
     log.debug("Searching for templates in: %s" % args.inputdir)
