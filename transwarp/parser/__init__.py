@@ -1,6 +1,6 @@
 import fileinput
 from transwarp.parser.file import File
-from transwarp.parser.grammar import RE_PARSER_DEF, RE_STRUCT_FIELD, RE_DOC, RE_BLANK, RE_SECTION, RE_FIELD
+from transwarp.parser.grammar import RE_PARSER_DEF, RE_STRUCT_FIELD, RE_DOC, RE_BLANK, RE_BLOCK, RE_FIELD
 
 class Parser(object):
 
@@ -14,7 +14,7 @@ class Parser(object):
             return ""
 
     def parse_file(self):
-        sections = []
+        blocks = []
         comment = []
         line = self.nextline()
         while line:
@@ -27,10 +27,10 @@ class Parser(object):
                 line = self.nextline()
                 continue
 
-            section = RE_SECTION.search(line)
-            if section:
-                section_comment = comment[:]
-                section_lines = []
+            block = RE_BLOCK.search(line)
+            if block:
+                block_comment = comment[:]
+                block_lines = []
                 comment = []
                 while line:
                     line = self.nextline()
@@ -39,15 +39,15 @@ class Parser(object):
 
                     field = RE_FIELD.match(line)
                     if field:
-                        section_lines.append(field.group(1))
+                        block_lines.append(field.group(1))
                     else:
-                        typ, header = section.groups()
-                        sections.append((typ, header, section_lines, section_comment))
+                        typ, header = block.groups()
+                        blocks.append((typ, header, block_lines, block_comment))
                         break
                 continue
             else:
                 raise ValueError("Unknown line: %r" % line)
-        return sections
+        return blocks
 
 from pprint import pprint
 def parse(files):
