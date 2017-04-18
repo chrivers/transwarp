@@ -1,10 +1,12 @@
 import os
+import sys
 import enum
 import glob
 import datetime
 import tempfile
 import logging as log
 
+import transwarp.template
 from transwarp.cmdline.pathutils import *
 
 class Status(enum.Enum):
