@@ -1,3 +1,4 @@
+import os
 import sys
 from contextlib import contextmanager
 
@@ -28,8 +29,8 @@ def scoped_search_paths(paths):
         if p in sys.path:
             sys.path.remove
 
-def generate(tmpl, sections, link_paths):
-    template = MakoTemplate(tmpl)
+def generate(tmplfile, sections, link_paths):
+    template = MakoTemplate(filename=os.path.abspath(tmplfile))
     empty = SearchableList()
     context = {
         "enums": sections.get("enum", empty),

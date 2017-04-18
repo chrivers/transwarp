@@ -38,9 +38,9 @@ class Compiler(object):
         log.debug("parsed %d stf files" % (len(self.files)))
         self.data = transwarp.parser.parse(all_lines)
 
-    def render(self, template):
+    def render(self, templatefile):
         return transwarp.template.generate(
-            template,
+            templatefile,
             self.data,
             self.link_paths,
         )

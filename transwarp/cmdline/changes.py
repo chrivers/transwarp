@@ -123,8 +123,7 @@ class Template(object):
 
     def render(self, compiler):
         try:
-            code = open(self.input_file).read()
-            return compiler.render(code)
+            return compiler.render(self.input_file)
         except ImportError as E:
             log.error("Compiler plugin [%s] not found for [%s]" % (E.name, self.output_file))
             log.error("  hint: Add search path with -L<path>")
@@ -149,8 +148,7 @@ class Template(object):
             )
 
     def update(self, compiler, differ):
-        code = open(self.input_file).read()
-        text = compiler.render(code)
+        text = compiler.render(self.input_file)
 
         target_dir = os.path.dirname(self.output_file)
         if target_dir:
