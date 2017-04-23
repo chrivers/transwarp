@@ -31,6 +31,9 @@ class Compiler(object):
         newest = datetime.datetime.fromtimestamp(0)
         for name in self.files:
             newest = max(newest, path_mtime(name))
+        for link_path in self.link_paths:
+            for link_file in glob.glob("%s/*.py" % link_path):
+                newest = max(newest, path_mtime(link_file))
         return newest
 
     def compile(self):
