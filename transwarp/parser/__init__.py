@@ -19,7 +19,7 @@ def parse(lines):
     items = parse_lines(lines)
 
     res = {}
-    for typ, header, section_lines, section_comment in items:
+    for typ, header, section_lines, section_comment in sorted(items):
         if typ in parsers:
             parser = parsers[typ]
             if not typ in res:

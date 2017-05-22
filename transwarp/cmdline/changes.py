@@ -39,7 +39,7 @@ class Changes(object):
 
     def grouped(self):
         res = {}
-        for key, value in self.templates.items():
+        for key, value in sorted(self.templates.items()):
             res.setdefault(value.status, []).append(value)
         return res
 
