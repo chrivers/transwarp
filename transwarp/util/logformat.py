@@ -19,7 +19,15 @@ class Formatter(object):
                 "fg_white":  "\033[;1m",
             }
         else:
-            self.color = {}
+            self.color = {
+                "normal":    "",
+                "fg_green":  "",
+                "fg_yellow": "",
+                "fg_red":    "",
+                "fg_blue":   "",
+                "fg_purple": "",
+                "fg_white":  "",
+            }
 
         self.levelsymbols = {
             10: "D",
