@@ -2,6 +2,11 @@ from transwarp.util.data import SearchableList
 from transwarp.parser.grammar import *
 
 class Const(object):
+
+    @staticmethod
+    def parse(text):
+        return int(text, 0)
+
     def __init__(self, name, expr, comment):
         self._cmt = comment
         self._name = name
