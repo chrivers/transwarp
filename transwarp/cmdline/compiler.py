@@ -20,7 +20,7 @@ class Compiler(object):
         files = glob.glob("%s/*.stf" % datadir)
         if files:
             log.debug("found stf files:")
-            for name in files:
+            for name in sorted(files):
                 log.debug("  %s" % name)
                 self.files.add(name)
         else:

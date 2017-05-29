@@ -33,10 +33,10 @@ class Changes(object):
         return sum(1 for template in self.templates.values() if not template.fresh)
 
     def __iter__(self):
-        return iter(template for template in self.templates.values() if not template.fresh)
+        return iter(template for template in sorted(self.templates.values()) if not template.fresh)
 
     def __getitem__(self, status):
-        return iter(template for template in self.templates.values() if template.status == status)
+        return iter(template for template in sorted(self.templates.values()) if template.status == status)
 
     def grouped(self):
         res = {}
