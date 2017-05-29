@@ -37,3 +37,11 @@ class Type(object):
             return "%s%s <%s>" % (self.name, arg, ",  ".join(repr(e) for e in self._args))
         else:
             return "%s%s" % (self.name, arg)
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def link(self):
+        return self._link
