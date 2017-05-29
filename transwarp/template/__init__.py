@@ -29,17 +29,18 @@ def scoped_search_paths(paths):
         if p in sys.path:
             sys.path.remove
 
-def generate(tmplfile, sections, link_paths):
+def generate(tmplfile, files, link_paths):
     template = MakoTemplate(filename=os.path.abspath(tmplfile))
     empty = SearchableList()
     context = {
-        "enums": sections.get("enum", empty),
-        "flags": sections.get("flags", empty),
-        "packets": sections.get("packet", empty),
-        "structs": sections.get("struct", empty),
-        "objects": sections.get("object", empty),
-        "parsers": sections.get("parser", empty),
-
+        "enums": files.get("enums", empty),
+        "flags": files.get("flags", empty),
+        "structs": files.get("structs", empty),
+        "objects": files.get("objects", empty),
+        "server": files.get("server", empty),
+        "client": files.get("client", empty),
+        "parsers": files.get("parser", empty),
+        "files": files,
         "util": transwarp.template.util,
     }
     with mako_context(context):
