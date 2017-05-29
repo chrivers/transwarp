@@ -77,10 +77,9 @@ class Parser(object):
                 curlevel = len(block.group(1) or "") / 4
                 if curlevel != level and level:
                     break
-                _expr = Type.parse("%s<%s>" % (block.group(2), block.group(4) or ""))
                 blocks.append(self.parse_block(
                     name=block.group(3),
-                    expr=_expr,
+                    expr=block.group(2),
                     comment=nextcomment,
                     level=level + 1
                 ))
