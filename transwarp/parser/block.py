@@ -66,5 +66,5 @@ class Block(object):
     def without(self, *names):
         return self.blocks.without(*names)
 
-    def get(self, name, require=False):
-        return self.blocks.get(name, require)
+    def get(self, name, default=...):
+        return self.blocks.get(name, default)
