@@ -30,3 +30,10 @@ class Type(object):
     def __getitem__(self, index):
         if index < len(self._args):
             return self._args[index]
+
+    def __repr__(self):
+        arg = "{%s}" % self._link.fullname if self._link else ""
+        if len(self._args):
+            return "%s%s <%s>" % (self.name, arg, ",  ".join(repr(e) for e in self._args))
+        else:
+            return "%s%s" % (self.name, arg)
