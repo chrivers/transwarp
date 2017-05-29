@@ -24,12 +24,12 @@ class Parser(object):
             self._lastline = ""
         return self._lastline
 
-    def parse_block(self, name=None, expr=None, comment=None, level=0):
+    def parse_block(self, level=0):
         self.nextline()
         blocks = SearchableList()
         fields = SearchableList()
         consts = SearchableList()
-        nextcomment = []
+        comment = []
         while self.line:
             if RE_BLANK.match(self.line):
                 # print("BLANK: [%r]" % self.line)
@@ -42,7 +42,7 @@ class Parser(object):
                 curlevel = len(docline.group(1) or "") / 4
                 if curlevel != level and level:
                     break
-                nextcomment.append(docline.group(2).strip())
+                comment.append(docline.group(2).strip())
 
                 self.nextline()
                 continue
@@ -53,8 +53,8 @@ class Parser(object):
                 curlevel = len(field.group(1) or "") / 4
                 if curlevel != level and level:
                     break
-                fields.append(Field(field.group(2), Type.parse(field.group(3)), comment=nextcomment))
-                nextcomment = []
+                fields.append(Field(field.group(2), Type.parse(field.group(3)), comment=comment))
+                comment = []
 
                 self.nextline()
                 continue
@@ -65,8 +65,8 @@ class Parser(object):
                 curlevel = len(const.group(1) or "") / 4
                 if curlevel != level and level:
                     break
-                consts.append(Const(const.group(2), Const.parse(const.group(3)), comment=nextcomment))
-                nextcomment = []
+                consts.append(Const(const.group(2), Const.parse(const.group(3)), comment=comment))
+                comment = []
 
                 self.nextline()
                 continue
@@ -77,19 +77,22 @@ class Parser(object):
                 curlevel = len(block.group(1) or "") / 4
                 if curlevel != level and level:
                     break
-                blocks.append(self.parse_block(
+                _blocks, _fields, _consts = self.parse_block(level=level + 1)
+                blocks.append(Block(
                     name=block.group(3),
                     expr=block.group(2),
-                    comment=nextcomment,
-                    level=level + 1
+                    blocks=_blocks,
+                    fields=_fields,
+                    consts=_consts,
+                    comment=comment,
                 ))
-                nextcomment = []
+                comment = []
                 continue
 
             raise ValueError("Parse error for line: %r" % self.line)
 
         blocks.sort()
-        return Block(name, expr, blocks, fields, consts, comment)
+        return blocks, fields, consts
 
 def parse(files):
     res = SearchableList()
@@ -98,5 +101,6 @@ def parse(files):
         lines = open(name)
         parser = Parser(lines)
         ident = os.path.splitext(os.path.basename(name))[0]
-        res.append(parser.parse_block(name=ident, expr=name))
+        blocks, fields, consts = parser.parse_block()
+        res.append(Block(name=ident, expr=name, blocks=blocks, fields=fields, consts=consts, comment=name))
     return res
