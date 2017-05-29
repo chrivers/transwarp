@@ -68,3 +68,9 @@ class Block(object):
 
     def get(self, name, default=...):
         return self.blocks.get(name, default)
+
+    def const(self, name, default=...):
+        if name in self.consts:
+            return self.consts.get(name).expr
+        else:
+            return default
