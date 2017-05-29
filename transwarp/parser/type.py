@@ -1,8 +1,9 @@
 from transwarp.parser.grammar import RE_TYPE
-from transwarp.types import SectionObject
 
-class Type(SectionObject):
-    def __init__(self, text):
+class Type(object):
+
+    @classmethod
+    def parse(cls, text):
         match = RE_TYPE.match(text)
         if not match:
             raise ValueError("Could not parse type [%r]" % text)
@@ -12,16 +13,19 @@ class Type(SectionObject):
             match = RE_TYPE.match(argstr)
             if match:
                 a, b = match.span()
-                pargs.append(Type(argstr[a:b]))
+                pargs.append(cls.parse(argstr[a:b]))
                 argstr = argstr[b:].strip()
                 if argstr.startswith(","):
                     argstr = argstr[1:].lstrip()
             else:
                 raise ValueError("Could not parse type argument [%r]" % argstr)
                 break
+        return cls(name, pargs)
 
+    def __init__(self, name, args, link=None):
         self._name = name
-        self._args = pargs
+        self._args = args
+        self._link = link
 
     def __getitem__(self, index):
         if index < len(self._args):
