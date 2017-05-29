@@ -32,7 +32,7 @@ class SearchableList(object):
 
     def __iter__(self):
         for elm in self.data:
-            if not (elm.name.startswith("__") and elm.name.endswith("__")):
+            if not elm.name.startswith("@"):
                 yield elm
 
     def without(self, *names):
