@@ -57,3 +57,9 @@ class Block(object):
     @property
     def fullname(self):
         return "::".join(self.path)
+
+    def without(self, *names):
+        return self.blocks.without(*names)
+
+    def get(self, name, require=False):
+        return self.blocks.get(name, require)
