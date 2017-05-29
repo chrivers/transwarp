@@ -6,6 +6,7 @@ class Field(object):
         self._name = name
         self._type = type
         self._cmt = comment
+        self._name_width = 20
 
     @property
     def name(self):
@@ -18,3 +19,7 @@ class Field(object):
     @property
     def comment(self):
         return self._cmt
+
+    @property
+    def aligned_name(self):
+        return "{:{width}}".format(self._name, width=self._name_width)

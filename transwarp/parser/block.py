@@ -19,6 +19,9 @@ class Block(object):
         for const in self.consts:
             const._name_width = tw
             const._value_width = hw
+        tw = text_width(fields)
+        for field in self.fields:
+            field._name_width = tw
 
     def __repr__(self):
         return "BLOCK<%s, %s, %s>{ blocks = {%s}, fields = {%s}, consts = {%s} }" % (
