@@ -4,7 +4,7 @@ import fileinput
 import logging as log
 
 import transwarp.template
-
+import transwarp.linker
 from transwarp.cmdline.pathutils import *
 
 class Compiler(object):
@@ -37,7 +37,8 @@ class Compiler(object):
         return newest
 
     def compile(self):
-        self.data = transwarp.parser.parse(self.files)
+        data = transwarp.parser.parse(self.files)
+        self.data = transwarp.linker.link(data)
 
     def render(self, templatefile):
         return transwarp.template.generate(
