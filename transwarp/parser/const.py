@@ -36,4 +36,4 @@ class Const(object):
 
     @property
     def aligned_hex_value(self):
-        return "0x{:0{width}x}".format(int(str(self._expr), 0), width=self._value_width)
+        return "0x{:0{width}x}".format(self._expr, width=self._value_width)
