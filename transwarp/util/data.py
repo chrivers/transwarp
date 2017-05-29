@@ -1,13 +1,13 @@
 class SearchableList(list):
 
-    def get(self, name, require=True):
+    def get(self, name, default=...):
         for x in self:
             if x.name == name:
                 return x
-        if require:
+        if default == ...:
             raise KeyError("Could not find element with name [%r]" % (name, ))
         else:
-            return None
+            return default
 
     def without(self, *names):
         res = []
