@@ -40,7 +40,7 @@ class Parser(object):
             if docline:
                 # print("DOC: %r" % (docline.groups(), ))
                 curlevel = len(docline.group(1) or "") / 4
-                if curlevel != level and level and curlevel:
+                if curlevel != level and level:
                     break
                 nextcomment.append(docline.group(2).strip())
 
@@ -51,7 +51,7 @@ class Parser(object):
             if field:
                 # print("FIELD: %r" % (field.groups(), ))
                 curlevel = len(field.group(1) or "") / 4
-                if curlevel != level and level and curlevel:
+                if curlevel != level and level:
                     break
                 fields.append(Field(field.group(2), Type.parse(field.group(3)), comment=nextcomment))
                 nextcomment = []
@@ -63,7 +63,7 @@ class Parser(object):
             if const:
                 # print("CONST: %r" % (const.groups(), ))
                 curlevel = len(const.group(1) or "") / 4
-                if curlevel != level and level and curlevel:
+                if curlevel != level and level:
                     break
                 consts.append(Const(const.group(2), Const.parse(const.group(3)), comment=nextcomment))
                 nextcomment = []
