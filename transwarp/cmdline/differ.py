@@ -38,7 +38,8 @@ class Differ(object):
         if retcode == 0:
             if touch_if_identical:
                 log.info("  %-32s unchanged (updating timestamp)" % (file_a))
-                path_touch(file_a)
+                if not path_touch(file_a):
+                    log.warning("Failed to update timestamp for %s!" % (file_a, ))
             else:
                 log.info("  %-32s unchanged" % (file_a))
         elif retcode == 1:

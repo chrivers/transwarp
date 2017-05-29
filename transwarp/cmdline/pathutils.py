@@ -26,7 +26,11 @@ def path_remove_ext(path, ext):
         return path
 
 def path_touch(path):
-    os.utime(path, None)
+    try:
+        os.utime(path, None)
+        return True
+    except FileNotFoundError:
+        return False
 
 def path_mtime(target=None):
     try:
