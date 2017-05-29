@@ -1,19 +1,11 @@
 import logging as log
 from transwarp.parser.type import Type
 from pprint import pprint, pformat
-from transwarp.parser.grammar import RE_IDENT_SPLIT
 
 def lookup(root, name):
     node = root
-    remainder = name
-    while True:
-        match = RE_IDENT_SPLIT.match(remainder)
-        if match:
-            step, mode, remainder = match.groups()
-            node = node.get(step)
-        else:
-            node = node.get(remainder)
-            break
+    for part in name.split("."):
+        node = node.get(part)
     return node
 
 def link_field(root, fd):
