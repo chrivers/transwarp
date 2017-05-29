@@ -16,11 +16,12 @@ class Status(enum.Enum):
 
 class Changes(object):
 
-    def __init__(self, output_dir, force_all, extension):
+    def __init__(self, output_dir, force_all, extension, filterfunc):
         self.extension = extension
         self.force_all = force_all
         self.output_dir = output_dir
         self.templates = {}
+        self.filterfunc = filterfunc
 
     def __bool__(self):
         for item in self.templates.values():
@@ -51,8 +52,11 @@ class Changes(object):
         for root, _, files in os.walk(path):
             reldir = root[len(path):]
             for name in files:
+                relpath = path_join(reldir, name)
+                if not self.filterfunc(relpath):
+                    log.debug("  ignoring %s due to filter" % relpath)
+                    continue
                 if path_has_ext(name, self.extension):
-                    relpath = path_join(reldir, name)
                     log.debug("  template %s" % relpath)
                     templates[relpath] = Template(path, relpath, self.output_dir, self.output_file_name(relpath), minimum_mtime)
             self.templates.update(templates)

@@ -15,13 +15,14 @@ from transwarp.cmdline.differ import Differ
 from transwarp.cmdline.changes import Changes, Status
 from transwarp.cmdline.compiler import Compiler
 from transwarp.cmdline.pathutils import *
+from transwarp.cmdline.filterfunc import filterfunc
 
 def main(args=None):
     transwarp.util.logformat.initialize()
     args = transwarp.cmdline.arguments.parse_and_validate()
 
     differ = Differ(["-u", "-N"])
-    changes = Changes(args.outputdir, args.force, args.extension)
+    changes = Changes(args.outputdir, args.force, args.extension, filterfunc(args.filter))
     compiler = Compiler()
     for path in args.linkdir:
         compiler.add_link_dir(path)

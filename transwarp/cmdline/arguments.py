@@ -130,9 +130,10 @@ _paths.add_argument(
 
 _paths.add_argument(
     "-F", "--filter",
-    action="store",
+    action="append",
     dest="filter",
     help="Ignore all templates outside of target <path>",
+    default=[],
     metavar="<path>"
 )
 
@@ -153,10 +154,13 @@ def parse_and_validate():
 
         if not args.datadir:
             raise ValueError("datadir (-D) is required")
-        if args.filter:
-            raise NotImplementedError("filter (-F) not yet supported")
         if args.export_mode:
             args.action = "export"
+        if args.outputdir != ".":
+            for index, filt in enumerate(args.filter):
+                if filt.startswith(args.outputdir):
+                    args.filter[index] = filt[len(args.outputdir)+1:]
+
         args.inputdir  = path_normalize(args.inputdir)
         args.outputdir = path_normalize(args.outputdir)
         args.linkdir   = [path_normalize(linkdir) for linkdir in args.linkdir]
