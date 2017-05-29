@@ -26,7 +26,7 @@ def link_type(root, tp):
         if not blk:
             log.error("Could not resolve typename [%s]" % tp.name)
             return
-        return Type(blk._expr, [Type(blk.name, tp._args)], link=blk)
+        return Type(blk._expr.name, [Type(blk.name, tp._args)], link=blk)
     else:
         return tp
 

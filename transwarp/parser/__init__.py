@@ -24,7 +24,7 @@ class Parser(object):
             self._lastline = ""
         return self._lastline
 
-    def parse_block(self, name=None, expr=None, arg=None, comment=None, level=0):
+    def parse_block(self, name=None, expr=None, comment=None, level=0):
         self.nextline()
         blocks = SearchableList()
         fields = SearchableList()
@@ -77,14 +77,10 @@ class Parser(object):
                 curlevel = len(block.group(1) or "") / 4
                 if curlevel != level and level:
                     break
-                if block.group(4):
-                    arg = Type.parse(block.group(4))
-                else:
-                    arg = Type("arg", [])
+                _expr = Type.parse("%s<%s>" % (block.group(2), block.group(4) or ""))
                 blocks.append(self.parse_block(
                     name=block.group(3),
-                    expr=block.group(2),
-                    arg=arg,
+                    expr=_expr,
                     comment=nextcomment,
                     level=level + 1
                 ))
@@ -94,7 +90,7 @@ class Parser(object):
             raise ValueError("Parse error for line: %r" % self.line)
 
         blocks.sort()
-        return Block(name, expr, blocks, fields, consts, arg, comment)
+        return Block(name, expr, blocks, fields, consts, comment)
 
 def parse(files):
     res = SearchableList()

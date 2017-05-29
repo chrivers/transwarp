@@ -3,12 +3,11 @@ from transwarp.parser.grammar import *
 from transwarp.parser.strutil import *
 
 class Block(object):
-    def __init__(self, name, expr, blocks, fields, consts, arg, comment):
+    def __init__(self, name, expr, blocks, fields, consts, comment):
         self._parent = None
         self._cmt = comment
         self._name = name
         self._expr = expr
-        self.arg = arg
         self.fields = fields
         self.blocks = blocks
         for block in blocks:
@@ -24,10 +23,9 @@ class Block(object):
             field._name_width = tw
 
     def __repr__(self):
-        return "BLOCK<%s, %s, %s>{ blocks = {%s}, fields = {%s}, consts = {%s} }" % (
+        return "BLOCK<%s, %s>{ blocks = {%s}, fields = {%s}, consts = {%s} }" % (
             self._name,
             self._expr,
-            self.arg,
             ", ".join(f.name for f in self.blocks),
             ", ".join(f.name for f in self.fields),
             ", ".join(f.name for f in self.consts),
@@ -42,6 +40,10 @@ class Block(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def expr(self):
+        return self._expr
 
     @property
     def parent(self):
