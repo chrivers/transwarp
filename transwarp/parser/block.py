@@ -35,3 +35,25 @@ class Block(object):
 
     def __iter__(self):
         return iter(self.blocks)
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @property
+    def path(self):
+        top = self
+        res = []
+        while top:
+            res.append(top.name)
+            top = top.parent
+        res.reverse()
+        return res
+
+    @property
+    def fullname(self):
+        return "::".join(self.path)
