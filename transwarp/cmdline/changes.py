@@ -148,7 +148,8 @@ class Template(object):
                 compiled.name,
                 labels=(
                     "%s (existing)" % self.output_file,
-                    "%s (compiled)" % self.output_file)
+                    "%s (compiled)" % self.output_file
+                )
             )
 
     def update(self, compiler, differ):
