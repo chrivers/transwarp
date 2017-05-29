@@ -26,6 +26,3 @@ class Type(SectionObject):
     def __getitem__(self, index):
         if index < len(self._args):
             return self._args[index]
-
-    def ref(self, arg):
-        return "[%s as %s]" % (self.name, arg)
