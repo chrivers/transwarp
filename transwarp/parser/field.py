@@ -8,6 +8,12 @@ class Field(object):
         self._cmt = comment
         self._name_width = 20
 
+    def __repr__(self):
+        return "FIELD{%s: %s}" % (
+            self._name,
+            self._type,
+        )
+
     @property
     def name(self):
         return self._name
