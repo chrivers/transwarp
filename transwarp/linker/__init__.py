@@ -23,12 +23,12 @@ def link_type(root, tp):
         return tp
 
 def link_block(root, node):
-    for block in node.blocks:
+    for block in node.blocks.all():
         link_block(root, block)
-    for field in node.fields:
+    for field in node.fields.all():
         link_field(root, field)
 
 def link(data):
-    for block in data:
+    for block in data.all():
         link_block(data, block)
     return data
