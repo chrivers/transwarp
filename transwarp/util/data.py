@@ -20,6 +20,12 @@ class SearchableList(object):
             if not elm.name.startswith("@"):
                 yield elm
 
+    def __str__(self):
+        return "[%s]" % (", ".join("{%s}" % (elm.name) for elm in self.data))
+
+    def __repr__(self):
+        return "[%s]" % (", ".join(repr(elm) for elm in self.data))
+
     def append(self, val):
         self.data.append(val)
 
