@@ -72,5 +72,7 @@ class Block(object):
     def const(self, name, default=...):
         if name in self.consts:
             return self.consts.get(name).expr
+        elif default == ...:
+            raise KeyError("Could not find constant with name [%r]" % (name, ))
         else:
             return default
