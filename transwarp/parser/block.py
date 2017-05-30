@@ -76,3 +76,6 @@ class Block(object):
             raise KeyError("Could not find constant with name [%r]" % (name, ))
         else:
             return default
+
+    def field(self, name, default=...):
+        return self.fields.get(name, default)
