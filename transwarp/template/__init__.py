@@ -33,16 +33,11 @@ def generate(tmplfile, files, link_paths):
     template = MakoTemplate(filename=os.path.abspath(tmplfile))
     empty = SearchableList()
     context = {
-        "enums": files.get("enums", empty),
-        "flags": files.get("flags", empty),
-        "structs": files.get("structs", empty),
-        "objects": files.get("objects", empty),
-        "server": files.get("server", empty),
-        "client": files.get("client", empty),
-        "parsers": files.get("parser", empty),
         "files": files,
         "util": transwarp.template.util,
     }
+    for fl in files:
+        context["_%s" % fl.name] = fl
     with mako_context(context):
         with scoped_search_paths(link_paths):
             return template.render(**context)
