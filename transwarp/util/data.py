@@ -26,6 +26,9 @@ class SearchableList(object):
     def __repr__(self):
         return "[%s]" % (", ".join(repr(elm) for elm in self.data))
 
+    def all(self):
+        return iter(self.data)
+
     def append(self, val):
         self.data.append(val)
 
