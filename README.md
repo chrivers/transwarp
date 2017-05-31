@@ -1,8 +1,14 @@
 # Transwarp #
 
-Transwarp helps you describe protocol formats, and automatically
-generate corresponding code, documentation, test cases, or whatever
-you like! Your documentation will never be outdated again!
+Transwarp is a user-friendly compiler, that takes specification (in
+the form of `*.stf` files) as input, and helps you generate code,
+documentation, test cases, or whatever you like! Your documentation
+will never be outdated again!
+
+You can use `stf` files to describe protocols, data format, parsers,
+or pretty much anything that deals with structured data. The output
+can be source code, documentation, or any other user- or
+machine-readable thing you write a template for.
 
 The input data format is simple, and very easily extensible. It only
 enforces the most basic structure - you decide the rest!
@@ -10,11 +16,11 @@ enforces the most basic structure - you decide the rest!
 ## Overview ##
 
 ```
-+--------------------------+                                +---------------------+
-|                          |  Templates can load plugins    |                     |
-|  Template files (*.tpl)  <--------------------------------+  Compiler plugins   |
-|                          |                                |                     |
-+-+------------------------+                                +---------------------+
++--------------------------+                                +-------------------------+
+|                          |  Templates can load plugins    |                         |
+|  Template files (*.tpl)  <--------------------------------+ Compiler plugins (*.py) |
+|                          |                                |                         |
++-+------------------------+                                +-------------------------+
   |
   | Compiler loads templates  +----------------------+
   +--------------------------->                      |  Compiler writes output
@@ -22,20 +28,20 @@ enforces the most basic structure - you decide the rest!
   +--------------------------->                      |                         |
   | Compiler loads stf files  +----------------------+                         |
   |                                                                            |
-+-+------------------------+                                +------------------v--+
-|                          |                                |                     |
-|    Source files (*.stf)  |                                |  Generated content  |
-|                          |                                |                     |
-+--------------------------+                                +---------------------+
++-+------------------------+                                +------------------v------+
+|                          |                                |                         |
+|    Source files (*.stf)  |                                |    Generated content    |
+|                          |                                |                         |
++--------------------------+                                +-------------------------+
 ```
 
-To use transwarp, you need a protocol description, and a corresponding
+To use transwarp, you need a specification, and a corresponding
 template (or set of templates). The transwarp compiler parses all
 input files, and generates the output from your templates.
 
 After all input files are parsed, the data is put into a tree
-structure, which is made available for the templates to
-introspect. Since the templates are completely in charge of the
+structure, which is made available for the template code to inspect
+and transform. Since the templates are completely in charge of the
 output, there are no requirements for how (or how much) you have to
 use the available data. More importantly, you can start by making your
 existing source files into templates, and slowly build conversion
@@ -44,9 +50,13 @@ logic into them!
 The widely used, well-tested and well-documented [Mako
 template](http://www.makotemplates.org/) system is used for templating.
 
-## Quick start ##
+## Quick start example ##
 
-Okay, so you want to try out transwarp! Here's what you need:
+Okay, so you want to try out transwarp! Let's take a look at
+generating parser code and templates for the Artemis Space Bridge
+Simulator game.
+
+Here's what you need:
 
  0. python 3
  0. The transwarp compiler (https://github.com/chrivers/transwarp)
@@ -89,6 +99,7 @@ $ transwarp -D isolinear/protocol -I duranium/templates -L duranium/lib -O outpu
     output-dir/server/update.rs
     output-dir/server/writer.rs
     output-dir/structs.rs
+    ...
 ```
 
 Let's do a quick breakdown of the arguments here:
@@ -96,28 +107,36 @@ Let's do a quick breakdown of the arguments here:
 ```-D isolinear-chips/protocol```
 
 This points transwarp to the protocol specification. From this
-directory, all `*.stf` files are loaded. Order and filenames do not
-matter, except for maintenance reasons. Only the file content matters.
+directory, all `*.stf` files are loaded. The files are always loaded
+in alphabetical order, for consistency between runs. The templates
+will have access to each file, as a variable with the filename
+(without extension), prefixed by underscore.
+
+Example: `protocol.stf`, will be available as `_protocol` in the
+templates.
 
 ```-I duranium-templates/templates```
 
-Here we point transwarp to the input-dir. This directory is
+Here we point transwarp to the templates. This directory is
 *recursively* scanned for templates, to be generated. The default
 template file extension is `.tpl`, but this can be changed with the
---extension (-e) option.
+--extension (-e) option. For each input template, an output file will
+be generated in the output dir, except for the `.tpl` extension.
+
+Example: `server/writer.rs.tpl` will be output to `server/writer.rs`.
 
 ```-L duranium-templates/lib```
 
 Templates can load python code into the templates, which advanced
 templates can use to do more serious data processing. The duranium
-templates (that generate rust code), use a single such plugin
+templates (which generate rust code), use a single such plugin
 module. This is not strictly required, but makes the template code
 cleaner, since some repeated functionality can easily be shared in one
 place.
 
 Simpler templates, such as documentation generators, wouldn't have to
-use any plugins at all. It is completely realistic to write
-self-contained templates.
+use any plugins at all. It is very reasonable to write self-contained
+templates.
 
 ```-O output-dir```
 
@@ -143,11 +162,7 @@ $ transwarp -D isolinear/protocol -I duranium/templates -L duranium/lib -O outpu
 [*] Updated output-dir/server/writer.rs
 [*] Updated output-dir/client/writer.rs
 [*] Updated output-dir/client/reader.rs
-[*] Updated output-dir/maps.rs
-[*] Updated output-dir/enums.rs
-[*] Updated output-dir/server/reader.rs
-[*] Updated output-dir/server/update.rs
-[*] Updated output-dir/client/mod.rs
+...
 ```
 
 Transwarp looks at the modification time of both stf files and
@@ -182,13 +197,13 @@ $ transwarp -D myspec -O target
 Enable verbose mode to explain what is going on behind the scenes:
 
 ```
-$ transwarp -v -D data -I from -O to
+$ transwarp -D data -I template_dir -O output_dir -v
 ```
 
 Enable quiet mode to compile from build scripts without unnecessary output:
 
 ```
-$ transwarp -q -D specfiles -I ../templates -O src/protocol-parser/
+$ transwarp -D specfiles -I ../templates -O src/protocol-parser/ -q
 ```
 
 ## STF specifications ##
