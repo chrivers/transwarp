@@ -208,12 +208,114 @@ $ transwarp -D specfiles -I ../templates -O src/protocol-parser/ -q
 
 ## STF specifications ##
 
-The input data format, boringly named Simple Type Framework (.stf), is
+The input data format, the Simple Type Framework (.stf), is
 a user-friendly text-based format, designed to be easily
 human-readable while still being parsable.
 
-There are a few different types of sections, that can be used to
-describe different structures of data.
+There are *no keywords* in stf, only a few different types of
+structure. The stf files describe a data structure, which is then used
+by the template in whatever manner they wish. This leaves you in
+charge of how to structure and organize your specification data.
+
+There are exactly 4 kinds of "things" in stf files:
+
+ - blocks
+ - fields,
+ - constants
+ - types
+
+There are no reserved words, and no identifiers have special
+meanings. Let's discuss each of them in more detail.
+
+### Constants ###
+
+A constant is simple to define. The syntax is the following:
+
+ `name = 0x{hexvalue}`
+
+The name can consist of all alphanumeric characters, and the integer
+must be in hex format. Here's an example of a list of constants:
+
+```r
+InfusionPCoils        = 0x00
+HydrogenRam           = 0x01
+TauronFocusers        = 0x02
+CarapactionCoils      = 0x03
+PolyphasicCapacitors  = 0x04
+CetrociteCrystals     = 0x05
+```
+
+That's all you need to know about constants.
+
+### Fields ###
+
+If you need to store something that isn't an integer constant, you'll
+want to use a field. The syntax is:
+
+ `name : type`
+
+Notice that we use `:` instead of `=`. That's what separates fields
+from constants! In the next section, we will take a look at how types
+work, but here are some examples of fields for now:
+
+```yaml
+index: u32
+vessel_type_id: u32
+x_coordinate: f32
+y_coordinate: f32
+z_coordinate: f32
+pitch: f32
+```
+
+As you can probably surmise, "u32" and "f32" are valid types. But
+remember, there *are no* built-in types, keywords, or reserved
+identifiers in stf! In fact, all simple strings are valid type
+names. It is up to you (in the templates) to give these names meaning!
+
+But types can do more, when you need them to. We'll take a closer look
+in the next section.
+
+### Types ###
+
+As we saw in the previous section, any string of alphanumeric
+characters is a valid type: However, types have a powerful feature:
+*type arguments*. Any type can have type argument, and they are
+written in angle brackets, like so:
+
+`type<arg1, arg2, ...>`
+
+All type arguments are, themselves, types! This means that your type
+arguments can have type arguments, which can have.. you get the
+idea. Types are really just a compact way to describe a tree structure
+with named nodes.
+
+If a type is not followed by angle brackets, it has 0 type
+arguments. Here are some examples of valid types:
+
+```yaml
+f32
+u32
+string
+GameMasterButton<u8>
+DriveType<u8>
+map<ShipSystem, f32>
+map<TubeIndex, TubeStatus<u8>>
+```
+
+Again, *none* of these examples assume anything about the names given,
+and it is completely up to you to pick the names you would like to
+use. It is syntactically valid to construct a type called
+`u32<bool<string<with_milk>>>`, but it might be harder to come up with
+a reasonable explanation for what it *means*. But that's your job ;-)
+
+
+
+### Blocks ###
+
+A block is, in essence, a namespace. Think of it as a container you
+can put things into.
+
+ -
 
 ### Enum ###
 
@@ -333,14 +435,6 @@ packet ClientPacket
 
 Here we see a packet definition for `ClientPacket`, with 3 cases. Each
 case is then specified just like a `struct`.
-
-### Parsers ###
-
-t.b.d.
-
-### Types ###
-
-t.b.d.
 
 ## Licence ##
 
