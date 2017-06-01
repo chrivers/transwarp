@@ -239,7 +239,7 @@ A constant is simple to define. The syntax is the following:
 The name can consist of all alphanumeric characters, and the integer
 must be in hex format. Here's an example of a list of constants:
 
-```r
+```ruby
 InfusionPCoils        = 0x00
 HydrogenRam           = 0x01
 TauronFocusers        = 0x02
@@ -261,7 +261,7 @@ Notice that we use `:` instead of `=`. That's what separates fields
 from constants! In the next section, we will take a look at how types
 work, but here are some examples of fields for now:
 
-```.bsv
+```ruby
 index: u32
 vessel_type_id: u32
 x_coordinate: f32
@@ -321,7 +321,7 @@ as a container with a name you can refer to.
 
 Here's an example of the block syntax:
 
-```r
+```ruby
 expr name
     const1 = 0x01
     const2 = 0x02
@@ -364,7 +364,7 @@ each additional level of nesting.
 
 That was a bit of a mouthful, so let's take a look at some valid blocks:
 
-```r
+```ruby
 enum MediaCommand
     Delete   = 0x00
     Play     = 0x01
@@ -376,7 +376,7 @@ Here we have a block with the name `MediaCommand` and the expr
 
 Let's see a slightly more complex example:
 
-```r
+```ruby
 struct PlayerShipUpgrades
     mask_bytes = 11
 
@@ -391,11 +391,11 @@ This is a block with the name `PlayerShipUpgrades` and expr
 
 Finally, let's take a look at an example of nested blocks:
 
-```r
+```ruby
 packet ServerPacket
 
     struct AllShipSettings
-        ships: map<enums.ShipIndex, structs.ShipV240>
+        ships: map<ShipIndex, ShipV240>
 
     struct BeamFired
         id: i32
@@ -407,6 +407,53 @@ In this example, our `ServerPacket` block contains 2 blocks, named
 
 Now that you know how blocks, fields, types and constants work, you
 are free to combine them in any way you like!
+
+## Advanced features ##
+
+There are a few advanced features available, designed to make the
+format easier and more powerful to work with. Let's go through all
+three of them here, and afterwards you will know everything there is
+to know about the format!
+
+### Doc comments ###
+
+Making comments in the stf files is not a bad idea, but what if you'd
+like to use access your descriptions and examples from inside the
+templates? No problem, you simply need to mark a comment with `#` (doc
+comment) instead of `##` (regular comment). Lines marked when `#` will
+NOT be ignored by the compiler, but will instead have their text
+contents appended to the next item. Here are some examples:
+
+```ruby
+## this line is completely ignored by the compiler
+
+## the next line is a doc comment (but this line is not)
+# this enum is super important, because reasons
+enum VeryImportant
+  Wow = 0x10
+  NotWow = 0x20
+
+# this struct is less important than the enum
+struct LessImportant
+
+  ## You can also add docs for constants and fields, of course!
+  ## this is demonstrated below
+
+  # compared to VeryImportant, this is definitely not as good
+  KindOfWow: bool
+
+  # remember to do that thing here, because of...
+  ## you can inject normal comments in the middle of doc comments too
+  ## and it will work as expected (be ignored)
+  # ..the reasons for doing it
+  NoBigDeal: u32
+```
+
+To summarize: Like normal comments, doc comments do nothing on their
+own, but unlike normal comments, they are available to the templates,
+meaning you can use them to provide descriptions for your items, for
+example by converting them into comments in whatever target language
+your templates generate.
 
 ## Licence ##
 
