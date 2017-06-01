@@ -217,12 +217,15 @@ structure. The stf files describe a data structure, which is then used
 by the template in whatever manner they wish. This leaves you in
 charge of how to structure and organize your specification data.
 
+Any line that has `##` as the first non-whitespace contents, is
+regarded as a comment line, and will be completely ignored.
+
 There are exactly 4 kinds of "things" in stf files:
 
  - blocks
- - fields,
- - constants
+ - fields
  - types
+ - constants
 
 There are no reserved words, and no identifiers have special
 meanings. Let's discuss each of them in more detail.
@@ -258,7 +261,7 @@ Notice that we use `:` instead of `=`. That's what separates fields
 from constants! In the next section, we will take a look at how types
 work, but here are some examples of fields for now:
 
-```yaml
+```.bsv
 index: u32
 vessel_type_id: u32
 x_coordinate: f32
@@ -292,7 +295,7 @@ with named nodes.
 If a type is not followed by angle brackets, it has 0 type
 arguments. Here are some examples of valid types:
 
-```yaml
+```
 f32
 u32
 string
@@ -308,133 +311,102 @@ use. It is syntactically valid to construct a type called
 `u32<bool<string<with_milk>>>`, but it might be harder to come up with
 a reasonable explanation for what it *means*. But that's your job ;-)
 
-
+Now that we have the basic kinds of content explained, let's see how
+we can group it together to make it more useful.
 
 ### Blocks ###
 
-A block is, in essence, a namespace. Think of it as a container you
-can put things into.
+A block is, in essence, a namespace for a group of things. Think of it
+as a container with a name you can refer to.
 
- -
+Here's an example of the block syntax:
 
-### Enum ###
+```r
+expr name
+    const1 = 0x01
+    const2 = 0x02
+    const3 = 0x03
+    ...
 
-With the enum section, you can describe a collection of constants. It
-is up to the template to use this information later, so there's no
-requirement that your target language has an "enum" type.
-
-```capnp
-enum ShipSystem
-    Beams         = 0x00
-    Torpedoes     = 0x01
-    Sensors       = 0x02
-    Maneuvering   = 0x03
-    Impulse       = 0x04
-    WarpDrive     = 0x05
-    ForeShields   = 0x06
-    AftShields    = 0x07
+    field1: type1
+    field2: type2<foo>
+    field3: type3<a, b, c>
+    ...
 ```
 
-### Flags ###
+There's a few things going on here, so let's take a look at them one at a time.
 
-If you want to describe bitflags rather than an enum, you can use the
-"flags" section. The syntax and format is exactly identical to enums,
-but the templates have access to them in a separate node of the data
-structure.
+First of all, you start a block by writing 2 names on a line, with any
+amount of whitespace in between. The `name` part is used to refer to
+the block from the templates, and `expr` is any kind of descriptive
+word you like, to give your templates something some more
+information. For instance, you might like to refer to a block as an
+`enum`, a `struct` a `class`, or something like that. But you could
+just as well have a `document`, a `protocol` or a `spaceship`.
 
-```capnp
-flags EliteAbilities
-    STEALTH             = 0x0001
-    LOWVIS              = 0x0002
-    CLOAK               = 0x0004
-    HET                 = 0x0008
-    WARP                = 0x0010
-    TELEPORT            = 0x0020
-    TRACTOR             = 0x0040
+Second, we can see that blocks contain any number of constants and
+fields. These follow the exact syntax described earlier, so there
+should be no surprises here. It is customary (but not enforced) to put
+constants first, and fields later, although having blocks with both
+constants and fields is a uncommon in practice.
+
+Third, you need to put *exactly 4 spaces* in front of all content that
+goes in a block, to mark it as being part of that block. This is a
+little rigid, and could maybe be relaxed in a future stf
+specification, but for now it's always 4 spaces.
+
+Finally, you should know that only the header (expr + name) is
+mandatory - blocks do not have to have any constants or fields at
+all. Also, you can put blocks inside blocks (.. inside blocks,
+etc). As you have probably guessed by now, stf is not going to tell
+you how to structure your data. Of course, you add 4 more spaces for
+each additional level of nesting.
+
+That was a bit of a mouthful, so let's take a look at some valid blocks:
+
+```r
+enum MediaCommand
+    Delete   = 0x00
+    Play     = 0x01
+    Create   = 0x02
 ```
 
-### Struct ###
+Here we have a block with the name `MediaCommand` and the expr
+`enum`. It contains 3 constants, named `Delete`, `Play` and `Create`.
 
-Next up, we have the "struct" section type. Each struct is simply a
-list of fields (name, type), with an optional comment, like so:
+Let's see a slightly more complex example:
 
-```capnp
-struct SystemNodeStatus
-    # The X coordinate of the node relative to the ship's center.
-    x_coordinate: u8
+```r
+struct PlayerShipUpgrades
+    mask_bytes = 11
 
-    # The Y coordinate of the node relative to the ship's center.
-    y_coordinate: u8
-
-    # The Z coordinate of the node relative to the ship's center.
-    z_coordinate: u8
-
-    # The current damage level for this node. An undamaged node has a
-    # value of 0.0; any higher value indicates damage.
-    damage: f32
+    active: map<UpgradeType, bool8>
+    count: map<UpgradeType, i8>
+    time: map<UpgradeType, u16>
 ```
 
-Here we see a struct with 4 fields, each with a simple (primitive)
-type. STF attached no particular meaning to these type names, however!
-That work is entirely left up to the user. There is also no limitation
-on type names, as long as they are grammatically valid.
+This is a block with the name `PlayerShipUpgrades` and expr
+`struct`. It contains 1 constant, `mask_bytes` and 3 fields, `active`,
+`count` and `time`.
 
-### Object ###
+Finally, let's take a look at an example of nested blocks:
 
-Sometimes, it is useful to attach data to structures, without putting
-it in a comment, or having it as a formal field. In this case, one can
-use the "object" section type:
+```r
+packet ServerPacket
 
-```capnp
-## bit mask size is 2
-object Torpedo(2)
-    # X coordinate (bit 1.1, float)
-    # The torpedo's location on the X axis.
-    x_coordinate: f32
+    struct AllShipSettings
+        ships: map<enums.ShipIndex, structs.ShipV240>
 
-    # Y coordinate (bit 1.2, float)
-    # The torpedo's location on the Y axis.
-    y_coordinate: f32
-
-    # Z coordinate (bit 1.3, float)
-    # The torpedo's location on the Z axis.
-    z_coordinate: f32
+    struct BeamFired
+        id: i32
 ```
 
-In this example, a `Torpedo` object is defined, with the parameter
-`2`. Except for the definition line, the syntax for `object` is
-exactly equal to `struct`
+In this example, our `ServerPacket` block contains 2 blocks, named
+`AllShipSettings` (which contains the field `ships`) and `BeamFired`
+(which contains the field `id`), respectively.
 
-### Packets ###
-
-One of the last section types is `packet`, which is the only section
-type that has two levels. It allows you to describe a multiple-choice
-type situation, where each individual case works like a struct. It
-looks like this:
-
-```capnp
-packet ClientPacket
-    ActivateUpgrade
-        # The upgrade to activate. The game is prepared for 28 (30?)
-        # different types of powerups, but only 8 are available as
-        # of Artemis 2.4.
-        target: enum<u32, UpgradeActivation>
-
-    AudioCommand
-        # The ID for the audio message. This is given by the
-        # IncomingAudioPacket.
-        audio_id: i32
-
-        # The desired action to perform.
-        audio_command: enum<u32, AudioCommand>
-
-    CaptainSelect
-        # The object ID for the new target, or 1 if the target has been cleared.
-        target_id: i32
-```
-
-Here we see a packet definition for `ClientPacket`, with 3 cases. Each
-case is then specified just like a `struct`.
+Now that you know how blocks, fields, types and constants work, you
+are free to combine them in any way you like!
 
 ## Licence ##
 
