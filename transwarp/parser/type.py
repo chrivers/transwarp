@@ -31,6 +31,9 @@ class Type(object):
         if index < len(self._args):
             return self._args[index]
 
+    def __len__(self):
+        return len(self._args)
+
     def __repr__(self):
         arg = "{%s}" % self._link.fullname if self._link else ""
         if len(self._args):
