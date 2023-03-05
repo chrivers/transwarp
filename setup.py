@@ -19,10 +19,11 @@ setup(
     packages = [
         "transwarp",
         "transwarp.cmdline",
-        "transwarp.types",
         "transwarp.parser",
         "transwarp.template",
         "transwarp.util",
+        "transwarp.linker",
+        "transwarp.export",
     ],
     entry_points = {
         'console_scripts': [
