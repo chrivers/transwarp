@@ -48,3 +48,7 @@ class Type(object):
     @property
     def link(self):
         return self._link
+
+    @property
+    def args(self):
+        return self._args
