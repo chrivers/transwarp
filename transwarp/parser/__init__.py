@@ -91,7 +91,6 @@ class Parser(object):
 
             raise ValueError("Parse error for line: %r" % self.line)
 
-        blocks.sort()
         return blocks, fields, consts
 
 def parse(files):
