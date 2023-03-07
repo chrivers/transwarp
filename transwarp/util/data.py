@@ -12,6 +12,9 @@ class SearchableList(object):
                 return True
         return False
 
+    def __len__(self):
+        return len(self.data)
+
     def __getitem__(self, idx):
         return self.data[idx]
 
